@@ -1,0 +1,160 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFireDatabase } from '@angular/fire/database';
+import { Storage } from '@capacitor/storage';
+import { from, Observable, of, throwError } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { Credentials, User } from '../models';
+// import * as CryptoJS from 'crypto-js';
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+
+
+  public _token: string;
+  private readonly TOKEN_LABEL = 'API_FAMILYCHAT_TOKEN';
+
+
+  constructor(private http: HttpClient, private auth: AngularFireAuth, private firebase: AngularFireDatabase) { }
+
+
+  login(email: string, password: string): Observable<any> {
+    return from(this.logintWhitFirebase(email, password)).pipe(
+      switchMap((response) => {
+
+        if(response?.error){
+          return throwError({error: response?.error}) //forzar el error
+         }
+
+        return this.firebase.list('/users').snapshotChanges().pipe(
+          map(users => {
+            const loginUi = response?.userCredential?.user?.uid
+            const userLogIn = users.find((user: any) => user?.payload.toJSON().ui === loginUi)
+
+            this.saveLocalToken(response?.userCredential?.user?.uid);
+            return {
+              $key: userLogIn?.key,
+              name: (userLogIn.payload.toJSON() as any)?.name,
+              email: (userLogIn.payload.toJSON() as any)?.email,
+              ui: (userLogIn.payload.toJSON() as any)?.ui
+            }
+          })
+        )
+      })
+    )
+  }
+
+  register(email:string, password:string, name:string): Observable<User> {
+    return from(this.registerWhitFirebase(email, password, name)).pipe(
+      map(response => {
+        if(response?.error){
+          throw throwError({error: response?.error}) //forzar el error
+        }
+        return response?.userCredential
+      })
+    )
+  }
+
+  autologin(): Observable<any> {
+    return from(this.getLocalToken()).pipe(
+      switchMap( (token) => {
+        this._token = token
+        if (!this._token) return throwError({ message: 'Token not found' });
+
+        return this.firebase.list('/users').snapshotChanges().pipe(
+          map(users => {
+            const userLogIn = users.find((user: any) => user?.payload.toJSON().ui === token)
+            return {
+              $key: userLogIn?.key,
+              name: (userLogIn.payload.toJSON() as any)?.name,
+              email: (userLogIn.payload.toJSON() as any)?.email,
+              ui: (userLogIn.payload.toJSON() as any)?.ui
+            }
+          })
+        )
+      })
+    )
+  }
+
+  logout(): void {
+    // console.log(this.getLocalToken())
+    // console.log(this._token)
+    this.auth.signOut();
+    this.removeLocalToken()
+    this._token = null;
+    // console.log(this.getLocalToken())
+    // console.log(this._token)
+  }
+
+  getUserInfo(credentials?: Credentials): Observable<User> {
+    return of(credentials)
+  }
+
+  // LOGIN FIREBASE
+  async logintWhitFirebase(email:string, password:string): Promise<any>{
+    return await this.auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      return {userCredential}
+    })
+    .catch((error) => {
+      return {error: error.message}
+    })
+  }
+
+  // REGISTER FIREBASE
+  async registerWhitFirebase(email:string, password:string, name:string): Promise<any>{
+    return await this.auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        const ui = userCredential?.user?.uid || '';
+
+        // password: CryptoJS.AES.encrypt(password, 'SECRET_KEY'),
+        this.firebase.list('/users').push({name, email, password, ui}).then((response) => {
+          return {response}
+        })
+        .catch((error) => {
+          return {error: error.message}
+        })
+
+       return {userCredential}
+
+    })
+    .catch((error) => {
+      return {error: error.message}
+    })
+  }
+
+  //***************************** STORAGE *****************************
+  // SAVE TOKEN
+  async saveLocalToken(token: string){
+    this._token = token
+    await Storage.set({key: this.TOKEN_LABEL, value: token})
+  }
+
+  // GET TOKEN
+  async getLocalToken(){
+    const token = await Storage.get({key: this.TOKEN_LABEL})
+    return await token?.value
+  }
+
+  // REMOVE TOKEN
+  async removeLocalToken(){
+    await Storage.remove({key: this.TOKEN_LABEL})
+  }
+
+
+  // getHeaders(): HttpHeaders {
+  //   const language = this.translate.currentLang;
+  //   return new HttpHeaders({
+  //     'Accept-Language': language,
+  //     Authorization: `Bearer ${this._token}`,
+  //     // 'Content-Type':'application/force-download',
+  //     'Content-Type': 'application/json',
+  //     // 'Content-Type': 'multipart/form-data'
+  //     // 'enctype': 'multipart/form-data'
+  //   });
+  // };
+
+
+}
