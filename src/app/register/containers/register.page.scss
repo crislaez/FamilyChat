@@ -1,0 +1,43 @@
+@import '../../../theme/variables';
+
+.container-login{
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+}
+
+form{
+  width: 80%;
+  height: 70%;
+  // background: blue;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+
+  ion-item{
+    border-radius: 10px;
+    border: none;
+    margin-bottom: 15px;
+  }
+
+  ion-button{
+    width: 80%;
+    height: 50px;
+    margin-top: 30px;
+  }
+}
+
+img{
+  width: 30%;
+  height: 7em;
+}
+
+a{
+  margin-top: 100px;
+}

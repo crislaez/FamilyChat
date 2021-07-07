@@ -1,0 +1,31 @@
+{
+  "COMMON":{
+    "TITLE":"Family chat",
+    "CHAT_TITLE":"CHATS",
+    "REGISTER_ERROR":"Error en el registro",
+    "LOGIN_ERROR":"Correo o clave incorrectos",
+    "NAME":"Nombre...",
+    "EMAIL":"Correo...",
+    "PASSWORD":"Clave...",
+    "REPEAT_PASSWORD":"Repetir clave...",
+    "HAS_USER":"Ya tengo cuenta. ir al login",
+    "NOT_HAS_USER":"No tengo cuenta. ir al registro",
+    "REGISTER":"Registrarse",
+    "LOGIN":"Logearse",
+    "REGISTER_SUCCESS":"Registrado correctamente",
+    "LOGIN_SUCCESS":"Logeado correctamente",
+    "REGISTER_FAILURE":"Ha ocurriod un error en el registro",
+    "LOGIN_FAILURE":"Ha ocurriod un error en el registro",
+    "REGISTER_FAILURE_USER_EXIST":"Ya existe un usuario con esas credenciales",
+    "LOGIN_INVALID_CREDENTIALST":"Correo o clave incorrectos"
+  },
+  "FORMS":{
+    "EMPTY_NAME":"Rellena el campo nombre",
+    "EMPTY_EMAIL":"Rellena el campo email",
+    "EMPTY_PASSWORD":"Rellena el campo clave",
+    "EMPTY_REPEAT_PASSWORD":"Rellena el campo repetir clave",
+    "ERROR_PASSWORDS":"Las claves deven coincidir",
+    "ERROR_EMAIL":"Email incorrecto",
+    "ERROR_PASSWORD_LENGTH":"La clave tiene que tener mas de 6 caracteres"
+  }
+}
