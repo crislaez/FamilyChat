@@ -13,7 +13,8 @@ import { Store } from '@ngrx/store';
       <ion-title class="text-color" >{{'COMMON.CHAT_TITLE' | translate}}</ion-title>
 
       <ion-button fill="clear" size="small" slot="end" (click)="presentActionSheet()">
-        <ion-icon class="text-color" name="menu-outline"></ion-icon>
+        <!-- <ion-icon class="text-color" name="menu-outline"></ion-icon> -->
+        <ion-icon class="text-color" name="settings-outline"></ion-icon>
       </ion-button>
     </ion-toolbar>
    </ion-header>
@@ -70,7 +71,7 @@ export class HomePage {
 
   async presentActionSheet() {
     const actionSheet = await this.actionSheetController.create({
-      header: 'Albums',
+      header: 'Edit',
       cssClass: 'my-custom-class',
       buttons: [{
         text: 'LogOut',

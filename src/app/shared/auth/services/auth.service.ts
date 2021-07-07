@@ -52,6 +52,7 @@ export class AuthService {
         if(response?.error){
           throw throwError({error: response?.error}) //forzar el error
         }
+        console.log(response?.userCredential)
         return response?.userCredential
       })
     )
@@ -94,35 +95,59 @@ export class AuthService {
 
   // LOGIN FIREBASE
   async logintWhitFirebase(email:string, password:string): Promise<any>{
-    return await this.auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
+    try{
+      const userCredential =  await this.auth.signInWithEmailAndPassword(email, password)
       return {userCredential}
-    })
-    .catch((error) => {
+    }
+    catch(error){
       return {error: error.message}
-    })
+    }
+
+    // return await this.auth.signInWithEmailAndPassword(email, password)
+    // .then((userCredential) => {
+    //   return {userCredential}
+    // })
+    // .catch((error) => {
+    //   return {error: error.message}
+    // })
   }
 
   // REGISTER FIREBASE
   async registerWhitFirebase(email:string, password:string, name:string): Promise<any>{
-    return await this.auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        const ui = userCredential?.user?.uid || '';
+    try{
+      const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+      const ui = userCredential?.user?.uid || '';
 
-        // password: CryptoJS.AES.encrypt(password, 'SECRET_KEY'),
-        this.firebase.list('/users').push({name, email, password, ui}).then((response) => {
-          return {response}
-        })
-        .catch((error) => {
-          return {error: error.message}
-        })
-
-       return {userCredential}
-
-    })
-    .catch((error) => {
+      try{
+        const response = await this.firebase.list('/users').push({name, email, password, ui})
+        return {response}
+      }
+      catch(error){
+        return {error: error.message}
+      }
+    }
+    catch(error){
       return {error: error.message}
-    })
+    }
+
+    // return await this.auth.createUserWithEmailAndPassword(email, password)
+    // .then((userCredential) => {
+    //     const ui = userCredential?.user?.uid || '';
+
+    //     // password: CryptoJS.AES.encrypt(password, 'SECRET_KEY'),
+    //     this.firebase.list('/users').push({name, email, password, ui}).then((response) => {
+    //       return {response}
+    //     })
+    //     .catch((error) => {
+    //       return {error: error.message}
+    //     })
+
+    //    return {userCredential}
+
+    // })
+    // .catch((error) => {
+    //   return {error: error.message}
+    // })
   }
 
   //***************************** STORAGE *****************************
