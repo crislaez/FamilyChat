@@ -7,6 +7,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { LoginPage } from './containers/login.page';
 import { LoginPageRoutingModule } from './login-routing.module';
 import { AuthModule } from '@familyChat/shared/auth/auth.module';
+import { ChatroomModule } from '@familyChat/shared/chatroom/chatroom.module';
+
 
 @NgModule({
   imports: [
@@ -16,7 +18,8 @@ import { AuthModule } from '@familyChat/shared/auth/auth.module';
     LoginPageRoutingModule,
     TranslateModule.forChild(),
     SharedModule,
-    AuthModule
+    AuthModule,
+    ChatroomModule
   ],
   declarations: [LoginPage]
 })

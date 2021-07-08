@@ -247,13 +247,13 @@
 }
 
 
-$backColor: #0073BD;
+$backColor: #212D3B;
 $textColor: white;
 $textCardColor: #030303;
 $errorColor: red;
 
 .loadingspinner{
-  --color: white;
+  --color: #030303;
 }
 
 ion-infinite-scroll-content{
@@ -384,6 +384,22 @@ form{
   width: 90%;
   margin: auto;
   margin-top: 30px;
+}
+
+ion-list{
+  width:100%;
+
+  ion-item{
+
+    ion-avatar{
+      width:15%;
+      height:3em;
+    }
+
+    ion-label{
+      height:50px;
+    }
+  }
 }
 
 //efecto riple para las redirecciones como los botones

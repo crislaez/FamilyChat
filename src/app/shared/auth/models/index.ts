@@ -9,6 +9,7 @@ export interface User {
   name?: string
   email?: string;
   ui?: string;
+  create_at?: string
   // password?: string;
 }
 

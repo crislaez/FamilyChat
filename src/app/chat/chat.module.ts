@@ -6,20 +6,21 @@ import { ChatroomModule } from '@familyChat/shared/chatroom/chatroom.module';
 import { SharedModule } from '@familyChat/shared/shared/shared.module';
 import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
-import { HomePage } from './containers/home.page';
-import { HomePageRoutingModule } from './home-routing.module';
+import { ChatPageRoutingModule } from './chat-routing.module';
+import { ChatPage } from './containers/chat.page';
+
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    HomePageRoutingModule,
+    ChatPageRoutingModule,
     TranslateModule.forChild(),
     SharedModule,
     AuthModule,
     ChatroomModule
   ],
-  declarations: [HomePage]
+  declarations: [ChatPage]
 })
-export class HomePageModule {}
+export class ChatPageModule {}

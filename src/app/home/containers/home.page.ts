@@ -3,7 +3,9 @@ import { gotToTop, trackById } from '@familyChat/shared/shared/utils/utils';
 import { IonContent } from '@ionic/angular';
 import { ActionSheetController } from '@ionic/angular';
 import { AuthActions } from '@familyChat/shared/auth';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
+import { Chatroom, fromChatroom } from '@familyChat/shared/chatroom';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -22,6 +24,28 @@ import { Store } from '@ngrx/store';
 
   <ion-content [fullscreen]="true" [scrollEvents]="true" (ionScroll)="logScrolling($any($event))">
     <div class="container components-color">
+
+      <ng-container *ngIf="(chatrooms$ | async) as chatrooms">
+        <ng-container *ngIf="!(pending$ | async); else loader">
+          <ng-container *ngIf="chatrooms?.length > 0; else noData">
+
+            <ion-list>
+              <ion-item *ngFor="let chatroom of chatrooms; trackBy: trackById" [routerLink]="['/chat/'+chatroom?.$key]">
+                <ion-avatar slot="start">
+                  <img [src]="chatroom?.value?.image">
+                </ion-avatar>
+                <ion-label>
+                  <h2>{{chatroom?.value?.name}}</h2>
+                  <!-- <p>-</p>
+                  <p>-</p> -->
+                </ion-label>
+              </ion-item>
+            </ion-list>
+
+
+          </ng-container>
+        </ng-container>
+      </ng-container>
 
 
       <!-- REFRESH -->
@@ -59,8 +83,13 @@ export class HomePage {
   trackById = trackById;
   showButton: boolean = false;
 
+  pending$: Observable<boolean> = this.store.pipe(select(fromChatroom.getPending));
+  chatrooms$: Observable<Chatroom[]> = this.store.pipe(select(fromChatroom.getChatrooms));
 
-  constructor(public actionSheetController: ActionSheetController, private store: Store) { }
+
+  constructor(public actionSheetController: ActionSheetController, private store: Store) {
+    // this.chatrooms$.subscribe(data => console.log(data))
+  }
 
 
   // SCROLL EVENT
@@ -87,3 +116,6 @@ export class HomePage {
   }
 
 }
+
+
+

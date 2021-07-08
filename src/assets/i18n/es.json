@@ -2,6 +2,7 @@
   "COMMON":{
     "TITLE":"Family chat",
     "CHAT_TITLE":"CHATS",
+    "NORESULT":"No hay datos",
     "REGISTER_ERROR":"Error en el registro",
     "LOGIN_ERROR":"Correo o clave incorrectos",
     "NAME":"Nombre...",

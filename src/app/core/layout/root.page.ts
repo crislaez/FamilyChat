@@ -44,7 +44,7 @@ import { filter, map } from 'rxjs/operators';
 
      </ion-tab-bar>
    </ion-tabs> -->
-
+   <!-- <div>Iconos diseñados por <a href="https://www.flaticon.es/autores/flat-icons" title="Flat Icons">Flat Icons</a> from <a href="https://www.flaticon.es/" title="Flaticon">www.flaticon.es</a></div> -->
  </ion-app>
  `,
   styleUrls: ['./root.page.scss'],

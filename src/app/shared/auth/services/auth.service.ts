@@ -7,6 +7,7 @@ import { from, Observable, of, throwError } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { Credentials, User } from '../models';
 // import * as CryptoJS from 'crypto-js';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -15,6 +16,8 @@ export class AuthService {
 
   public _token: string;
   private readonly TOKEN_LABEL = 'API_FAMILYCHAT_TOKEN';
+  // private readonly key = CryptoJS.enc.Utf8.parse("11221123342123");
+  // private readonly iv = CryptoJS.enc.Utf8.parse("7712333123");
 
 
   constructor(private http: HttpClient, private auth: AngularFireAuth, private firebase: AngularFireDatabase) { }
@@ -38,7 +41,8 @@ export class AuthService {
               $key: userLogIn?.key,
               name: (userLogIn.payload.toJSON() as any)?.name,
               email: (userLogIn.payload.toJSON() as any)?.email,
-              ui: (userLogIn.payload.toJSON() as any)?.ui
+              ui: (userLogIn.payload.toJSON() as any)?.ui,
+              create_at: (userLogIn.payload.toJSON() as any)?.create_at
             }
           })
         )
@@ -52,7 +56,6 @@ export class AuthService {
         if(response?.error){
           throw throwError({error: response?.error}) //forzar el error
         }
-        console.log(response?.userCredential)
         return response?.userCredential
       })
     )
@@ -71,7 +74,8 @@ export class AuthService {
               $key: userLogIn?.key,
               name: (userLogIn.payload.toJSON() as any)?.name,
               email: (userLogIn.payload.toJSON() as any)?.email,
-              ui: (userLogIn.payload.toJSON() as any)?.ui
+              ui: (userLogIn.payload.toJSON() as any)?.ui,
+              create_at: (userLogIn.payload.toJSON() as any)?.create_at
             }
           })
         )
@@ -119,7 +123,10 @@ export class AuthService {
       const ui = userCredential?.user?.uid || '';
 
       try{
-        const response = await this.firebase.list('/users').push({name, email, password, ui})
+        const newDate = new Date();
+        const create_at = newDate.getTime();
+
+        const response = await this.firebase.list('/users').push({name, email, password, ui, create_at})
         return {response}
       }
       catch(error){

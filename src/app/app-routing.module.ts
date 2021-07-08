@@ -9,6 +9,10 @@ const routes: Routes = [
     canLoad: [AuthGuard]
   },
   {
+    path: 'chat',
+    loadChildren: () => import('./chat/chat.module').then( m => m.ChatPageModule)
+  },
+  {
     path: 'login',
     loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule),
     canActivate: [GuestGuard]
