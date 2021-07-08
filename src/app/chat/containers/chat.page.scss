@@ -1,0 +1,33 @@
+@import '../../../theme/variables';
+
+
+ion-avatar{
+  margin-left: 10%
+}
+
+ion-toolbar{
+  height:100%
+}
+
+form {
+  // background:red;
+  --background:#232E3C;
+  margin-top: 0px;
+  width: 100%;
+  height: 50px;
+  // @include displays-around;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+
+  ion-item, ion-input{
+    --background:#232E3C;
+    width: 80%;
+    height: 50px;
+  }
+
+  ion-button{
+    width: 15%
+  }
+}

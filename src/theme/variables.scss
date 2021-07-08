@@ -247,13 +247,40 @@
 }
 
 
-$backColor: #212D3B;
+$backColor: #232E3C;
 $textColor: white;
 $textCardColor: #030303;
 $errorColor: red;
+$backSecondColor: #32455C;
 
 .loadingspinner{
   --color: #030303;
+}
+
+.loadingspinnerSecond{
+  --color: white;
+}
+
+// PAGE COLOR
+.text-color{
+  color: $textColor;
+}
+
+.text-second-color{
+  color: $backColor;
+}
+
+// PAGE BACKGROUND COLOR
+.components-color{
+  background: $textColor;
+}
+
+.components-color-second{
+  background: $backColor;
+}
+
+.components-color-third{
+  background: $backSecondColor;
 }
 
 ion-infinite-scroll-content{
@@ -304,6 +331,11 @@ ion-header{
   }
 }
 
+ion-footer, ion-toolbar{
+  height:50px;
+  --background: $backColor !important;
+}
+
 //footer barra abajo
 ion-tab-bar{
   background: $backColor;
@@ -327,22 +359,22 @@ ion-menu{
   }
 }
 
-ion-content{
-  --background: #0073BD !important;
-  //$textColor
-}
+// ion-content{
+//   --background: #0073BD !important;
+//   //$textColor
+// }
 
 ion-card{
   // width: 40%;
   width: 94%;
-  background: $backColor;
-  color: $textCardColor !important;
+  background: $backSecondColor;
+  color: $textColor !important;
   // --background: rgba(255,255,255,0.1);
 
   //titulo de la card
   ion-card-title{
-    color: $textCardColor !important;
-    font-size: 20px;
+    color: $textColor !important;
+    font-size: 15px;
     text-align: center;
     text-transform: uppercase;
   }
@@ -350,7 +382,7 @@ ion-card{
   //contenido de la card
   ion-card-content{
     font-size: 13px;
-    text-align: center;
+    // text-align: center;
   }
 
   h3, h4{
@@ -358,6 +390,7 @@ ion-card{
   }
 
   img{
+    font-size: 15px;
     width: 100%;
     border-radius: 50%;
   }
@@ -428,22 +461,9 @@ ion-list{
   text-transform: capitalize;
 }
 
-// PAGE COLOR
-.text-color{
-  color: $textColor;
-}
-
-.text-second-color{
-  color: $backColor;
-}
-
 .div-error{
   width: 90%;
   color: $errorColor;
-}
-// PAGE BACKGROUND COLOR
-.components-color{
-  background: $textColor;
 }
 
 .width-max{
@@ -513,6 +533,10 @@ ion-list{
   font-size: 23px !important;
 }
 
+.mediun-size{
+  font-size: 17px !important;
+}
+
 // ********** END APP CONFIG
 .div-header-fixed{
   width: 100%;
@@ -555,18 +579,6 @@ ion-list{
     width: 90%;
     margin: auto;
   }
-}
-
-.div-container{
-  margin-top: 170px;
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  // align-items: flex-start !important;
-  align-content:flex-start
 }
 
 .empty-header{

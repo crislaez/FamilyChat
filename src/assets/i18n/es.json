@@ -18,7 +18,8 @@
     "REGISTER_FAILURE":"Ha ocurriod un error en el registro",
     "LOGIN_FAILURE":"Ha ocurriod un error en el registro",
     "REGISTER_FAILURE_USER_EXIST":"Ya existe un usuario con esas credenciales",
-    "LOGIN_INVALID_CREDENTIALST":"Correo o clave incorrectos"
+    "LOGIN_INVALID_CREDENTIALST":"Correo o clave incorrectos",
+    "MESSAGE_SEND_ERROR":"Error al enviar el mensaje"
   },
   "FORMS":{
     "EMPTY_NAME":"Rellena el campo nombre",

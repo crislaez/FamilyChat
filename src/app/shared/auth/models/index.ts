@@ -10,7 +10,7 @@ export interface User {
   email?: string;
   ui?: string;
   create_at?: string
-  // password?: string;
+  avatar?: string;
 }
 
 // export interface LoginApiResponse {

@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ViewChild } from '@angular/core';
-import { gotToTop, trackById } from '@familyChat/shared/shared/utils/utils';
+import { gotToTop, trackById, errorImage } from '@familyChat/shared/shared/utils/utils';
 import { IonContent } from '@ionic/angular';
 import { ActionSheetController } from '@ionic/angular';
 import { AuthActions } from '@familyChat/shared/auth';
@@ -12,11 +12,12 @@ import { Observable } from 'rxjs';
   template: `
   <ion-header no-border >
     <ion-toolbar mode="md|ios">
-      <ion-title class="text-color" >{{'COMMON.CHAT_TITLE' | translate}}</ion-title>
+      <ion-title class="text-color" >{{'COMMON.TITLE' | translate}}</ion-title>
 
       <ion-button fill="clear" size="small" slot="end" (click)="presentActionSheet()">
         <!-- <ion-icon class="text-color" name="menu-outline"></ion-icon> -->
-        <ion-icon class="text-color" name="settings-outline"></ion-icon>
+        <!-- <ion-icon class="text-color" name="settings-outline"></ion-icon> -->
+        <ion-icon class="text-color" name="ellipsis-vertical-outline"></ion-icon>
       </ion-button>
     </ion-toolbar>
    </ion-header>
@@ -29,10 +30,10 @@ import { Observable } from 'rxjs';
         <ng-container *ngIf="!(pending$ | async); else loader">
           <ng-container *ngIf="chatrooms?.length > 0; else noData">
 
-            <ion-list>
+            <ion-list class="fade-in-card">
               <ion-item *ngFor="let chatroom of chatrooms; trackBy: trackById" [routerLink]="['/chat/'+chatroom?.$key]">
                 <ion-avatar slot="start">
-                  <img [src]="chatroom?.value?.image">
+                  <img [src]="chatroom?.value?.image" (error)="errorImage($event)">
                 </ion-avatar>
                 <ion-label>
                   <h2>{{chatroom?.value?.name}}</h2>
@@ -81,6 +82,7 @@ export class HomePage {
   @ViewChild(IonContent, {static: true}) content: IonContent;
   gotToTop = gotToTop;
   trackById = trackById;
+  errorImage = errorImage;
   showButton: boolean = false;
 
   pending$: Observable<boolean> = this.store.pipe(select(fromChatroom.getPending));

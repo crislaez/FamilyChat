@@ -27,6 +27,11 @@ export const getPending = createSelector(
   fromChatroom.getPending
 );
 
+export const getPendingStatus = createSelector(
+  getChatroomState,
+  fromChatroom.getPendingStatus
+);
+
 // export const getChatroom = (idChatroom: string) => createSelector(
 //   getChatrooms,
 //   (chatrooms) => {

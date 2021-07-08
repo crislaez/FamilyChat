@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
-import { Observable, throwError } from 'rxjs';
+import { from, Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +44,28 @@ export class ChatroomService {
     )
   }
 
+  saveMessageByChatroom(message: any, key:string): Observable<any>{
+    return from(this.saveMessage(message, key)).pipe(
+      map(response => {
+        if(response?.error){
+          throw throwError({error: response?.error}) //forzar el error
+        }
+        return response
+      })
+    )
+  }
+
+  async saveMessage(message: any, key:string): Promise<any>{
+    try{
+      const response = await this.firebase.list(`/chatrooms/${key}/messages`).push(message)
+      // const response = await this.firebase.database.ref(`/chatrooms/${key}`).child('messages').set(message)
+      return {response}
+    }
+    catch(error){
+      console.log(error)
+      return {error: error.message}
+    }
+  }
 
   async createChat(): Promise<any>{
     try{
