@@ -18,8 +18,8 @@ import { ChatroomModule } from '@familyChat/shared/chatroom/chatroom.module';
     LoginPageRoutingModule,
     TranslateModule.forChild(),
     SharedModule,
-    AuthModule,
-    ChatroomModule
+    // AuthModule,
+    // ChatroomModule
   ],
   declarations: [LoginPage]
 })

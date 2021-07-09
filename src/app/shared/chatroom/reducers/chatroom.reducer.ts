@@ -33,6 +33,10 @@ const chatroomReducer = createReducer(
   on(ChatroomActions.saveMessageFailure, (state, { error }) => ({...state, pending: false, pendingStatus:{ pending: false, error} })),
   on(ChatroomActions.saveMessageSuccess, (state) => ({...state, pending: false, pendingStatus:{ pending: false} })),
 
+  on(ChatroomActions.deleteMessage, (state) => ({...state, pending: true, pendingStatus:{ pending: true}})),
+  on(ChatroomActions.deleteMessageFailure, (state, { error }) => ({...state, pending: false, pendingStatus:{ pending: false, error} })),
+  on(ChatroomActions.deleteMessageSuccess, (state) => ({...state, pending: false, pendingStatus:{ pending: false} })),
+
 );
 
 export function reducer(state: State | undefined, action: ChatroomActions.ChatroomsActionsUnion){

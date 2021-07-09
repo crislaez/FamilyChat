@@ -42,7 +42,8 @@ export class AuthService {
               name: (userLogIn.payload.toJSON() as any)?.name,
               email: (userLogIn.payload.toJSON() as any)?.email,
               ui: (userLogIn.payload.toJSON() as any)?.ui,
-              create_at: (userLogIn.payload.toJSON() as any)?.create_at
+              create_at: (userLogIn.payload.toJSON() as any)?.create_at,
+              avatar: (userLogIn.payload.toJSON() as any)?.avatar
             }
           })
         )
@@ -75,7 +76,8 @@ export class AuthService {
               name: (userLogIn.payload.toJSON() as any)?.name,
               email: (userLogIn.payload.toJSON() as any)?.email,
               ui: (userLogIn.payload.toJSON() as any)?.ui,
-              create_at: (userLogIn.payload.toJSON() as any)?.create_at
+              create_at: (userLogIn.payload.toJSON() as any)?.create_at,
+              avatar: (userLogIn.payload.toJSON() as any)?.avatar
             }
           })
         )
@@ -106,14 +108,6 @@ export class AuthService {
     catch(error){
       return {error: error.message}
     }
-
-    // return await this.auth.signInWithEmailAndPassword(email, password)
-    // .then((userCredential) => {
-    //   return {userCredential}
-    // })
-    // .catch((error) => {
-    //   return {error: error.message}
-    // })
   }
 
   // REGISTER FIREBASE
@@ -126,7 +120,7 @@ export class AuthService {
         const newDate = new Date();
         const create_at = newDate.getTime();
 
-        const response = await this.firebase.list('/users').push({name, email, password, ui, create_at})
+        const response = await this.firebase.list('/users').push({name, email, password, ui, create_at, avatar:''})
         return {response}
       }
       catch(error){
@@ -136,25 +130,6 @@ export class AuthService {
     catch(error){
       return {error: error.message}
     }
-
-    // return await this.auth.createUserWithEmailAndPassword(email, password)
-    // .then((userCredential) => {
-    //     const ui = userCredential?.user?.uid || '';
-
-    //     // password: CryptoJS.AES.encrypt(password, 'SECRET_KEY'),
-    //     this.firebase.list('/users').push({name, email, password, ui}).then((response) => {
-    //       return {response}
-    //     })
-    //     .catch((error) => {
-    //       return {error: error.message}
-    //     })
-
-    //    return {userCredential}
-
-    // })
-    // .catch((error) => {
-    //   return {error: error.message}
-    // })
   }
 
   //***************************** STORAGE *****************************

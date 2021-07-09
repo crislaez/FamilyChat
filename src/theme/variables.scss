@@ -249,16 +249,20 @@
 
 $backColor: #232E3C;
 $textColor: white;
-$textCardColor: #030303;
 $errorColor: red;
 $backSecondColor: #32455C;
+$backThirdColor: #5185C5;
 
 .loadingspinner{
-  --color: #030303;
+  --color: #428cff;
 }
 
 .loadingspinnerSecond{
   --color: white;
+}
+
+ion-content{
+  --background: #232E3C !important;
 }
 
 // PAGE COLOR
@@ -359,14 +363,9 @@ ion-menu{
   }
 }
 
-// ion-content{
-//   --background: #0073BD !important;
-//   //$textColor
-// }
-
 ion-card{
   // width: 40%;
-  width: 94%;
+  width: 80%;
   background: $backSecondColor;
   color: $textColor !important;
   // --background: rgba(255,255,255,0.1);
@@ -502,6 +501,10 @@ ion-list{
   margin-top: 30px !important;
 }
 
+.margin-left-5{
+  margin-left: 5%;
+}
+
 .chip{
   border-radius: 10px;
   margin-top: 5px !important;
@@ -522,11 +525,19 @@ ion-list{
   justify-content: space-around;
 }
 
+.displays-start{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
 .displays-center{
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
 }
 
 .big-size{
@@ -608,8 +619,18 @@ ion-list{
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-content:flex-start
+  align-content: flex-start
 }
+
+.right{
+  justify-self: flex-end !important;
+  margin-left: auto;
+  background: $backThirdColor !important
+}
+
+// .my-custom-class .alert-wrapper {
+//   background: #e5e5e5;
+// }
 
 .fade-in-card {
   animation: fadeIn 2s;

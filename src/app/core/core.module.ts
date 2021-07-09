@@ -4,7 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { RootComponent } from './layout/root.page';
-import { RouterModule } from '@angular/router'
+import { RouterModule } from '@angular/router';
+import { AuthModule } from '@familyChat/shared/auth/auth.module';
+import { ChatroomModule } from '@familyChat/shared/chatroom/chatroom.module';
+
 
 @NgModule({
   imports: [
@@ -13,6 +16,8 @@ import { RouterModule } from '@angular/router'
     IonicModule,
     RouterModule,
     TranslateModule.forChild(),
+    AuthModule,
+    ChatroomModule
   ],
   declarations: [RootComponent]
 })

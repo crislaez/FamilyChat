@@ -15,11 +15,12 @@ import { ChatPage } from './containers/chat.page';
     CommonModule,
     FormsModule,
     IonicModule,
+    ChatroomModule,
     ChatPageRoutingModule,
     TranslateModule.forChild(),
     SharedModule,
-    AuthModule,
-    ChatroomModule
+    // AuthModule,
+    // ChatroomModule
   ],
   declarations: [ChatPage]
 })

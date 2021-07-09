@@ -17,8 +17,8 @@ import { HomePageRoutingModule } from './home-routing.module';
     HomePageRoutingModule,
     TranslateModule.forChild(),
     SharedModule,
-    AuthModule,
-    ChatroomModule
+    // AuthModule,
+    // ChatroomModule
   ],
   declarations: [HomePage]
 })

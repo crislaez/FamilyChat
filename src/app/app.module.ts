@@ -19,6 +19,7 @@ import { HttpErrorInterceptor } from './core/services/http-error.interceptor';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
 
+
 export function appInitializerFactory(translate: TranslateService, coreConfig: CoreConfigService): Function {
   coreConfig.importConfig(appConfig);
   return () => appInitTranslations(translate, appConfig.Languages, appConfig.DefaultLang);

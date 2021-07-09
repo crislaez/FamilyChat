@@ -43,7 +43,7 @@ export class ChatroomEffects {
 
   loadChatroom$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ChatroomActions.loadChatroom, ChatroomActions.saveMessageSuccess),
+      ofType(ChatroomActions.loadChatroom, ChatroomActions.saveMessageSuccess, ChatroomActions.deleteMessageSuccess),
       switchMap(({key}) =>
         this._chatroom.getChatroomByKey(key).pipe(
           map((chatroom) => ChatroomActions.saveChatroom({chatroom: chatroom || {}}) ),
@@ -71,9 +71,24 @@ export class ChatroomEffects {
     )
   );
 
+  deleteMessage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ChatroomActions.deleteMessage),
+      switchMap(({messageKey, key}) =>
+        this._chatroom.deleteMessageByChatroom(messageKey, key).pipe(
+          map(() => ChatroomActions.deleteMessageSuccess({key}) ),
+          catchError((error) => {
+            // console.log(error)
+            return [ChatroomActions.deleteMessageFailure({error: 'COMMON.MESSAGE_DELETE_ERROR'}) ]
+          })
+        )
+      )
+    )
+  );
+
   messageFailureAuth$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ChatroomActions.saveMessageFailure),
+      ofType(ChatroomActions.saveMessageFailure, ChatroomActions.deleteMessageFailure),
       tap(({error}) => this.presentToast(this.translate.instant(error), 'danger')),
     ), { dispatch: false }
   );

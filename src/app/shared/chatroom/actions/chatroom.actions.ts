@@ -11,12 +11,22 @@ export const saveMessage = createAction('[Chatroom] Save Message', props<{messag
 export const saveMessageFailure = createAction('[Chatroom] Save Message Failure', props<{error: string }>());
 export const saveMessageSuccess = createAction('[Chatroom] Save Message Success', props<{key: string}>());
 
+export const deleteMessage = createAction('[Chatroom] Delete Message', props<{messageKey: string, key: string}>());
+export const deleteMessageFailure = createAction('[Chatroom] Delete Message Failure', props<{error: string }>());
+export const deleteMessageSuccess = createAction('[Chatroom] Delete Message Success', props<{key: string}>());
+
 
 const all = union({
   loadChatrooms,
   saveChatrooms,
   loadChatroom,
-  saveChatroom
+  saveChatroom,
+  saveMessage,
+  saveMessageFailure,
+  saveMessageSuccess,
+  deleteMessage,
+  deleteMessageFailure,
+  deleteMessageSuccess
 })
 
 export type ChatroomsActionsUnion = typeof all;

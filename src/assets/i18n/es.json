@@ -19,7 +19,13 @@
     "LOGIN_FAILURE":"Ha ocurriod un error en el registro",
     "REGISTER_FAILURE_USER_EXIST":"Ya existe un usuario con esas credenciales",
     "LOGIN_INVALID_CREDENTIALST":"Correo o clave incorrectos",
-    "MESSAGE_SEND_ERROR":"Error al enviar el mensaje"
+    "MESSAGE_SEND_ERROR":"Error al enviar el mensaje",
+    "MESSAGE_DELETE_ERROR":"Error al borrar el mensaje",
+    "MESSAGE":"Mensaje...",
+    "ALERT":"Alerta",
+    "ALERT_DELETE_MESSAGE":"¿Estás seguro que quieres borrar el mensaje?",
+    "YES":"Si",
+    "NO":"No"
   },
   "FORMS":{
     "EMPTY_NAME":"Rellena el campo nombre",

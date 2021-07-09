@@ -1,82 +1,91 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ChatroomActions, fromChatroom } from '@familyChat/shared/chatroom';
-import { select, Store } from '@ngrx/store';
-import { from, Observable, Subject } from 'rxjs';
-import { filter, switchMap, tap } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { takeUntil } from 'rxjs/operators';
-import { trackById, errorImage, emptyObject } from '@familyChat/shared/shared/utils/utils';
+import { ActivatedRoute } from '@angular/router';
 import { fromAuth, User } from '@familyChat/shared/auth';
-
+import { ChatroomActions, fromChatroom } from '@familyChat/shared/chatroom';
+import { emptyObject, errorImage, trackById } from '@familyChat/shared/shared/utils/utils';
+import { AlertController } from '@ionic/angular';
+import { select, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
+import { Observable, Subject } from 'rxjs';
+import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-chat',
   template: `
-  <ng-container *ngIf="(info$ | async) as info; else noData">
+  <ng-container *ngIf="(info$ | async) as info; else loading">
+    <ng-container *ngIf="info; else noData">
+      <ng-container *ngIf="(userLoger$ | async) as userLoger">
 
-    <ion-header no-border >
-      <ion-toolbar mode="md|ios" class="components-color-second">
-        <ion-back-button defaultHref="/home" class="text-color" fill="clear" size="small" slot="start"  [text]="''"></ion-back-button>
-        <ion-avatar >
-          <img [src]="info?.image" (error)="errorImage($event)">
-        </ion-avatar>
-        <ion-title slot="end" class="text-color" >{{info?.name}}</ion-title>
-      </ion-toolbar>
-    </ion-header>
+        <ion-header no-border >
+          <ion-toolbar mode="md|ios" class="components-color-second">
+            <ion-back-button defaultHref="/home" class="text-color" fill="clear" size="small" slot="start"  [text]="''"></ion-back-button>
+            <ion-avatar class=ion-avatar-left>
+              <img [src]="info?.image" (error)="errorImage($event)">
+            </ion-avatar>
+            <ion-title slot="end" class="text-color" >{{info?.name}}</ion-title>
+          </ion-toolbar>
+        </ion-header>
 
 
-    <ion-content [fullscreen]="true" >
-      <div class="container components-color-second">
+        <ion-content [fullscreen]="true" #content>
+          <div class="container components-color-second">
 
-          <ng-container *ngIf="emptyObject(info?.messages); else noData">
-            <ion-card  *ngFor="let message of getObjectKeys(info?.messages); trackBy: trackById">
-              <!-- <ion-card-header>
-                <ion-card-title >{{info?.messages[message]?.name}}</ion-card-title>
-              </ion-card-header> -->
+            <ng-container *ngIf="!(pending$ | async); else loader">
+              <ng-container *ngIf="emptyObject(info?.messages); else noData">
+                <ion-card *ngFor="let message of getObjectKeys(info?.messages); trackBy: trackById" [ngClass]="{'right': userLoger?.ui === info?.messages[message]?.ui}">
+                  <ion-card-content >
 
-              <ion-card-content >
-                <div class="mediun-size">{{info?.messages[message]?.name}}:</div>
-                <div class="margin-top">{{info?.messages[message]?.message}}</div>
-              </ion-card-content>
+                    <ng-container *ngIf="userLoger?.ui !== info?.messages[message]?.ui; else isUser">
+                      <div class="displays-start width-max" >
+                        <ion-avatar>
+                          <img [src]="info?.messages[message]?.avatar" (error)="errorImage($event, true)">
+                        </ion-avatar>
+                        <div class="displays-center margin-left-5">{{info?.messages[message]?.name}}:</div>
+                      </div>
+                    </ng-container>
 
-              <!-- <ion-ripple-effect></ion-ripple-effect> -->
-            </ion-card>
-          </ng-container>
+                    <ng-template #isUser>
+                      <div class="div-delete">
+                        <ion-button fill="clear" class="text-color font-small" (click)="deleteMessage(message)"><ion-icon name="close-outline"></ion-icon></ion-button>
+                      </div>
+                    </ng-template>
 
-        <!-- REFRESH -->
-        <!-- <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-          <ion-refresher-content></ion-refresher-content>
-        </ion-refresher> -->
+                    <div class="margin-top">{{info?.messages[message]?.message}}</div>
+                    <div class="margin-top font-small">{{getTimeStamp(info?.messages[message]?.create_at) | date: 'MMMM d, h:mm a'}}</div>
+                  </ion-card-content>
+                </ion-card>
+              </ng-container>
+            </ng-container>
 
-        <!-- IS NO DATA  -->
-        <ng-template #noData>
-          <div class="error-serve">
-            <span class="text-color">{{'COMMON.NORESULT' | translate}}</span>
+            <ng-template #noData>
+              <div class="error-serve">
+                <span class="text-color">{{'COMMON.NORESULT' | translate}}</span>
+              </div>
+            </ng-template>
+
+
+            <ng-template #loader>
+              <ion-spinner class="loadingspinner"></ion-spinner>
+            </ng-template>
+
           </div>
-        </ng-template>
+        </ion-content>
 
-        <!-- LOADER  -->
-        <ng-template #loader>
-          <ion-spinner class="loadingspinnerSecond"></ion-spinner>
-        </ng-template>
+        <ion-footer >
+          <ion-toolbar class="components-color-second">
+            <form [formGroup]="messageForm" (submit)="messageSubmit($event, userLoger)">
+              <ion-item >
+                <ion-input class="text-color" [placeholder]="'COMMON.MESSAGE' | translate" formControlName="message" ></ion-input>
+              </ion-item>
 
-      </div>
-    </ion-content>
+              <ion-button fill="clear" class="text-color" type="submit"><ion-icon name="send-outline"></ion-icon></ion-button>
+            </form>
+          </ion-toolbar>
+        </ion-footer>
 
-    <ion-footer >
-      <ion-toolbar class="components-color-second">
-        <ng-container *ngIf="(userLoger$ | async) as userLoger">
-          <form [formGroup]="messageForm" (submit)="messageSubmit($event, userLoger)">
-            <ion-item >
-              <ion-input class="text-color" [placeholder]="'COMMON.EMAIL' | translate" formControlName="message" ></ion-input>
-            </ion-item>
-
-            <ion-button fill="clear" class="text-color" type="submit"><ion-icon name="send-outline"></ion-icon></ion-button>
-          </form>
-        </ng-container>
-      </ion-toolbar>
-    </ion-footer>
+      </ng-container>
+    </ng-container>
   </ng-container>
 
 
@@ -85,7 +94,7 @@ import { fromAuth, User } from '@familyChat/shared/auth';
     <ion-header no-border >
       <ion-toolbar mode="md|ios">
         <ion-title class="text-color" >{{'COMMON.CHAT_TITLE' | translate}}</ion-title>
-        <ion-back-button defaultHref="/home" class="text-color" fill="clear" size="small" slot="start"  [text]="''"></ion-back-button>
+        <ion-back-button defaultHref="/home" class="text-color" fill="clear" size="small" slot="start" [text]="''"></ion-back-button>
       </ion-toolbar>
     </ion-header>
 
@@ -97,12 +106,22 @@ import { fromAuth, User } from '@familyChat/shared/auth';
       </div>
     </ion-content>
   </ng-template>
+
+
+  <ng-template #loading>
+    <ion-content >
+      <div class="container components-color-third">
+        <ion-spinner class="loadingspinner"></ion-spinner>
+      </div>
+    </ion-content>
+  </ng-template>
   `,
   styleUrls: ['./chat.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatPage implements OnInit, OnDestroy{
 
+  @ViewChild('content') private content: any;
   trackById = trackById;
   errorImage = errorImage;
   emptyObject = emptyObject
@@ -113,21 +132,23 @@ export class ChatPage implements OnInit, OnDestroy{
 
   info$: Observable<any> = this.route.params.pipe(
     filter(({chatRoomKey}) => !!chatRoomKey),
-    tap(({chatRoomKey}) => this.store.dispatch(ChatroomActions.loadChatroom({key: chatRoomKey})) ),
-    switchMap(() => this.store.pipe(select(fromChatroom.getChatroom)))
+    tap(({chatRoomKey}) => this.store.dispatch(ChatroomActions.loadChatroom({key: chatRoomKey}))),
+    switchMap(() => {
+      return this.store.pipe(select(fromChatroom.getChatroom))
+    }),
+    tap(() => this.scrollToBottomOnInit())
   );
 
   messageForm = new FormGroup({
     message: new FormControl('', [Validators.required, Validators.email]),
     name: new FormControl(''),
     ui: new FormControl(''),
-    image: new FormControl(''),
     create_at: new FormControl(''),
     avatar: new FormControl(''),
   });
 
 
-  constructor(private store: Store, private route: ActivatedRoute) {
+  constructor(private store: Store, private route: ActivatedRoute, public alertController: AlertController, private translate: TranslateService,) {
     // this.info$.subscribe(data => console.log(data?.messages))
   }
 
@@ -140,6 +161,8 @@ export class ChatPage implements OnInit, OnDestroy{
         this.messageForm[val ? 'disable' : 'enable']();
       }
     })
+
+    setTimeout(() => this.content?.scrollToBottom(0), 500)
   }
 
   ngOnDestroy(): void{
@@ -147,6 +170,7 @@ export class ChatPage implements OnInit, OnDestroy{
     this.ngUnsubscribe$.complete();
   }
 
+  // SUBMIT MESSAGE
   messageSubmit(event: Event, userLoger: User): void{
     event.preventDefault();
 
@@ -157,18 +181,57 @@ export class ChatPage implements OnInit, OnDestroy{
     this.messageForm.controls.ui.setValue(userLoger?.ui);
     this.messageForm.controls.name.setValue(userLoger?.name);
     this.messageForm.controls.create_at.setValue(create_at);
-    // this.messageForm.controls.avatar.setValue(userLoger?.avatar);
-    this.messageForm.controls.avatar.setValue('');
+    this.messageForm.controls.avatar.setValue(userLoger?.avatar);
+    // this.messageForm.controls.avatar.setValue('');
 
     let key = this.route.snapshot?.params?.chatRoomKey
 
     this.store.dispatch(ChatroomActions.saveMessage({message:this.messageForm.value, key}))
-    this.messageForm.reset()
+    this.messageForm.reset();
+
   }
 
+  // CHAT OBJECTS KEY
   getObjectKeys(object): any{
     return Object.keys(object || {})
   }
 
+  //SCROLL TO BOTTOM
+  scrollToBottomOnInit() {
+    setTimeout(() => this.content?.scrollToBottom(0), 0)
+  }
+
+  getTimeStamp(timestamp:number): any{
+    return new Date(timestamp) || ''
+  }
+
+  async deleteMessage(messageKey: string) {
+    const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
+      header: this.translate.instant('COMMON.ALERT'),
+      // subHeader: 'Subtitle',
+      message: this.translate.instant('COMMON.ALERT_DELETE_MESSAGE'),
+      buttons: [
+        {
+          text: this.translate.instant('COMMON.NO'),
+          role: 'cancel',
+          cssClass: 'secondary',
+          // handler: (blah) => {
+          //   console.log('Confirm Cancel: blah');
+          // }
+        }, {
+          text: this.translate.instant('COMMON.YES'),
+          handler: () => {
+            let chatroomKey = this.route.snapshot?.params?.chatRoomKey
+            this.store.dispatch(ChatroomActions.deleteMessage({messageKey, key:chatroomKey}))
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+  }
 
 }
