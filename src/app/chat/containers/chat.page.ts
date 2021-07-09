@@ -18,12 +18,14 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
       <ng-container *ngIf="(userLoger$ | async) as userLoger">
 
         <ion-header no-border >
-          <ion-toolbar mode="md|ios" class="components-color-second">
-            <ion-back-button defaultHref="/home" class="text-color" fill="clear" size="small" slot="start"  [text]="''"></ion-back-button>
-            <ion-avatar class=ion-avatar-left>
+          <ion-toolbar mode="md|ios">
+            <ion-back-button defaultHref="/home" class="text-color" fill="clear" size="small" slot="start" [text]="''"></ion-back-button>
+
+            <ion-title class="text-color" slot="secondary" >{{info?.name}}</ion-title>
+
+            <ion-avatar>
               <img [src]="info?.image" (error)="errorImage($event)">
             </ion-avatar>
-            <ion-title slot="end" class="text-color" >{{info?.name}}</ion-title>
           </ion-toolbar>
         </ion-header>
 
@@ -47,7 +49,7 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
                     <ng-template #isUser>
                       <div class="div-delete">
-                        <ion-button fill="clear" class="text-color font-small" (click)="deleteMessage(message)"><ion-icon name="close-outline"></ion-icon></ion-button>
+                        <ion-button fill="clear" class="text-color" (click)="deleteMessage(message)"><ion-icon class="font-big" name="close-outline"></ion-icon></ion-button>
                       </div>
                     </ng-template>
 

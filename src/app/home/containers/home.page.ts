@@ -24,14 +24,15 @@ import { Observable } from 'rxjs';
 
 
   <ion-content [fullscreen]="true" [scrollEvents]="true" (ionScroll)="logScrolling($any($event))">
-    <div class="container components-color">
+    <div class="container components-color-second">
 
       <ng-container *ngIf="(chatrooms$ | async) as chatrooms">
         <ng-container *ngIf="!(pending$ | async); else loader">
           <ng-container *ngIf="chatrooms?.length > 0; else noData">
 
-            <ion-list class="fade-in-card">
-              <ion-item *ngFor="let chatroom of chatrooms; trackBy: trackById" [routerLink]="['/chat/'+chatroom?.$key]">
+          <!-- class="fade-in-card" -->
+            <ion-list>
+              <ion-item class="text-color" *ngFor="let chatroom of chatrooms; trackBy: trackById" [routerLink]="['/chat/'+chatroom?.$key]">
                 <ion-avatar slot="start">
                   <img [src]="chatroom?.value?.image" (error)="errorImage($event)">
                 </ion-avatar>
