@@ -20,9 +20,7 @@ export class GuestGuard implements CanActivate {
         this.store.pipe(select(fromAuth.isLoggedIn))
       ),
       map(([pending, isLoggedIn]) =>{
-        if(isLoggedIn) {
-          return this.router.parseUrl('/home')
-        }
+        if(isLoggedIn) return this.router.parseUrl('/home')
         return true;
       }),
       take(1)

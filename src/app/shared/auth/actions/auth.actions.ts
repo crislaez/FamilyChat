@@ -24,11 +24,11 @@ const all = union({
   autologin,
   autologinSuccess,
   autologinFailure,
-  logout,
-  forceLogout,
   register,
   registerSuccess,
-  registerFailure
+  registerFailure,
+  logout,
+  forceLogout,
 });
 
 export type AuthActionsUnion = typeof all;

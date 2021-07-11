@@ -12,7 +12,9 @@ import { takeUntil } from 'rxjs/operators';
   <ion-content >
     <div class="container-login components-color">
 
-      <img [src]="loginImage" (error)="errorImage($event)">
+      <div>
+        <img [src]="loginImage" (error)="errorImage($event)">
+      </div>
 
       <form [formGroup]="loginForm" (submit)="registerSubmit($event)">
 
@@ -32,8 +34,9 @@ import { takeUntil } from 'rxjs/operators';
 
       </form>
 
-      <a [routerLink]="['/register']">{{'COMMON.NOT_HAS_USER' | translate}}</a>
-
+      <div class="margin-top-30">
+        <a [routerLink]="['/register']">{{'COMMON.NOT_HAS_USER' | translate}}</a>
+      </div>
     </div>
 
   </ion-content>

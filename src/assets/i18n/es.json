@@ -24,6 +24,7 @@
     "MESSAGE":"Mensaje...",
     "ALERT":"Alerta",
     "ALERT_DELETE_MESSAGE":"¿Estás seguro que quieres borrar el mensaje?",
+    "DELETE_MESSAGE_SUCCESS":"Mensaje borrado",
     "YES":"Si",
     "NO":"No"
   },

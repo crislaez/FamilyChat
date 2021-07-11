@@ -4,7 +4,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { Storage } from '@capacitor/storage';
 import { from, Observable, of, throwError } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, catchError } from 'rxjs/operators';
 import { Credentials, User } from '../models';
 // import * as CryptoJS from 'crypto-js';
 
@@ -24,29 +24,37 @@ export class AuthService {
 
 
   login(email: string, password: string): Observable<any> {
+
     return from(this.logintWhitFirebase(email, password)).pipe(
       switchMap((response) => {
-
         if(response?.error){
           return throwError({error: response?.error}) //forzar el error
          }
 
         return this.firebase.list('/users').snapshotChanges().pipe(
           map(users => {
+
+            if(!response) throw throwError({error: response?.error})  //hay que colocar esto aqui porque se recarga esta funcion de firebase
+
             const loginUi = response?.userCredential?.user?.uid
             const userLogIn = users.find((user: any) => user?.payload.toJSON().ui === loginUi)
 
             this.saveLocalToken(response?.userCredential?.user?.uid);
+            response = null //hay que colocar esto aqui porque se recarga esta funcion de firebase
             return {
               $key: userLogIn?.key,
               name: (userLogIn.payload.toJSON() as any)?.name,
               email: (userLogIn.payload.toJSON() as any)?.email,
               ui: (userLogIn.payload.toJSON() as any)?.ui,
               create_at: (userLogIn.payload.toJSON() as any)?.create_at,
-              avatar: (userLogIn.payload.toJSON() as any)?.avatar
+              avatar: (userLogIn.payload.toJSON() as any)?.avatar,
+              chats: (userLogIn.payload.toJSON() as any)?.chats || ''
             }
           })
         )
+      }),
+      catchError((error) =>{
+        return throwError(error?.error?.message)
       })
     )
   }
@@ -77,7 +85,8 @@ export class AuthService {
               email: (userLogIn.payload.toJSON() as any)?.email,
               ui: (userLogIn.payload.toJSON() as any)?.ui,
               create_at: (userLogIn.payload.toJSON() as any)?.create_at,
-              avatar: (userLogIn.payload.toJSON() as any)?.avatar
+              avatar: (userLogIn.payload.toJSON() as any)?.avatar,
+              chats: (userLogIn.payload.toJSON() as any)?.chats || ''
             }
           })
         )
@@ -120,7 +129,7 @@ export class AuthService {
         const newDate = new Date();
         const create_at = newDate.getTime();
 
-        const response = await this.firebase.list('/users').push({name, email, password, ui, create_at, avatar:''})
+        const response = await this.firebase.list('/users').push({name, email, password, ui, create_at, avatar:'', chats:['-Me4gjWhJZhxkwowxrvc']})
         return {response}
       }
       catch(error){

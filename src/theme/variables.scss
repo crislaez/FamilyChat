@@ -246,13 +246,15 @@
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
-
-$backColor: #232E3C;
 $textColor: white;
+$textSecondColor: rgb(189, 189, 189);
 $errorColor: red;
-$backSecondColor: #32455C;
+$backColor: #0D1218;
+$backSecondColor: #202C39;
 $backThirdColor: #5185C5;
-
+// #323539
+// #232E3C
+// #32455C
 .loadingspinner{
   --color: #428cff;
 }
@@ -262,14 +264,19 @@ $backThirdColor: #5185C5;
 }
 
 ion-content{
-  --background: #232E3C !important;
+  --background: #0D1218 !important;
 }
 
-ion-list, ion-item{
-  --background: #232E3C !important;
-  background: #232E3C !important;
+ion-list {
+  background: #0D1218 !important;
   width:100%;
+
+  ion-item{
+    --background: #0D1218 !important;
+    width:100%;
+  }
 }
+
 
 // PAGE COLOR
 .text-color{
@@ -279,6 +286,11 @@ ion-list, ion-item{
 .text-second-color{
   color: $backColor;
 }
+
+.text-color-third{
+  color: $textSecondColor;
+}
+
 
 // PAGE BACKGROUND COLOR
 .components-color{
@@ -400,12 +412,12 @@ ion-card{
     border-radius: 50%;
   }
 
-  ion-button{
-    width: 70%;
-    height: 45px;
-    font-size: 14px;
-    // background: $textColor !important;
-  }
+  // ion-button{
+  //   width: 70%;
+  //   height: 45px;
+  //   font-size: 14px;
+  //   // background: $textColor !important;
+  // }
 
   ion-icon {
     font-size: 25px;
@@ -617,6 +629,9 @@ ion-list{
   form{
     width: 90%;
     margin: auto;
+    ion-item{
+      color: $textColor !important;
+    }
   }
 }
 

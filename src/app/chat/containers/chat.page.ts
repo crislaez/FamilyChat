@@ -38,23 +38,18 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
                 <ion-card *ngFor="let message of getObjectKeys(info?.messages); trackBy: trackById" [ngClass]="{'right': userLoger?.ui === info?.messages[message]?.ui}">
                   <ion-card-content >
 
-                    <ng-container *ngIf="userLoger?.ui !== info?.messages[message]?.ui; else isUser">
-                      <div class="displays-start width-max" >
+                      <div class="displays-start width-max">
                         <ion-avatar>
                           <img [src]="info?.messages[message]?.avatar" (error)="errorImage($event, true)">
                         </ion-avatar>
-                        <div class="displays-center margin-left-5">{{info?.messages[message]?.name}}:</div>
-                      </div>
-                    </ng-container>
 
-                    <ng-template #isUser>
-                      <div class="div-delete">
-                        <ion-button fill="clear" class="text-color" (click)="deleteMessage(message)"><ion-icon class="font-big" name="close-outline"></ion-icon></ion-button>
+                        <div class="displays-center margin-left-5">{{info?.messages[message]?.name}}:</div>
+                        <ion-button *ngIf="userLoger?.ui === info?.messages[message]?.ui" fill="clear" class="text-color delete-button displays-center" (click)="deleteMessage(message)"><ion-icon class="font-big" name="close-outline"></ion-icon></ion-button>
+
                       </div>
-                    </ng-template>
 
                     <div class="margin-top">{{info?.messages[message]?.message}}</div>
-                    <div class="margin-top font-small">{{getTimeStamp(info?.messages[message]?.create_at) | date: 'MMMM d, h:mm a'}}</div>
+                    <div class="margin-top font-small text-color-third">{{getTimeStamp(info?.messages[message]?.create_at) | date: 'MMMM d, h:mm a'}}</div>
                   </ion-card-content>
                 </ion-card>
               </ng-container>
@@ -78,10 +73,10 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
           <ion-toolbar class="components-color-second">
             <form [formGroup]="messageForm" (submit)="messageSubmit($event, userLoger)">
               <ion-item >
-                <ion-input class="text-color" [placeholder]="'COMMON.MESSAGE' | translate" formControlName="message" ></ion-input>
+                <ion-textarea class="text-color" [placeholder]="'COMMON.MESSAGE' | translate" formControlName="message" ></ion-textarea>
               </ion-item>
 
-              <ion-button fill="clear" class="text-color" type="submit"><ion-icon name="send-outline"></ion-icon></ion-button>
+              <ion-button fill="clear"  type="submit"><ion-icon class="text-color" name="send-outline"></ion-icon></ion-button>
             </form>
           </ion-toolbar>
         </ion-footer>
@@ -179,7 +174,6 @@ export class ChatPage implements OnInit, OnDestroy{
     const newDate = new Date();
     const create_at = newDate.getTime();
 
-    this.messageForm.controls.name.setValue(userLoger?.name);
     this.messageForm.controls.ui.setValue(userLoger?.ui);
     this.messageForm.controls.name.setValue(userLoger?.name);
     this.messageForm.controls.create_at.setValue(create_at);
@@ -188,8 +182,11 @@ export class ChatPage implements OnInit, OnDestroy{
 
     let key = this.route.snapshot?.params?.chatRoomKey
 
-    this.store.dispatch(ChatroomActions.saveMessage({message:this.messageForm.value, key}))
-    this.messageForm.reset();
+    if(!!this.messageForm.value?.message){
+      this.store.dispatch(ChatroomActions.saveMessage({message:this.messageForm.value, key}))
+      this.messageForm.reset();
+    }
+
 
   }
 

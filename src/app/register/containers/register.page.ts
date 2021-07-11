@@ -10,9 +10,11 @@ import { takeUntil } from 'rxjs/operators';
   selector: 'app-register',
   template: `
   <ion-content [fullscreen]="true">
-    <div class="container-login components-color">
+    <div class="container-register components-color">
 
-      <img [src]="loginImage" (error)="errorImage($event)">
+      <div>
+        <img [src]="loginImage" (error)="errorImage($event)">
+      </div>
 
       <form [formGroup]="registerForm" (submit)="registerSubmit($event)">
 
@@ -45,7 +47,9 @@ import { takeUntil } from 'rxjs/operators';
 
       </form>
 
-      <a [routerLink]="['/login']">{{'COMMON.HAS_USER' | translate}}</a>
+      <div class="margin-top-30">
+        <a [routerLink]="['/login']">{{'COMMON.HAS_USER' | translate}}</a>
+      </div>
 
     </div>
   </ion-content>
@@ -100,8 +104,5 @@ export class RegisterPage implements OnInit, OnDestroy {
   }
 
 
-// Carlas
-// carlas@gmail.com
-// carlas
 
 }

@@ -1,6 +1,6 @@
 @import '../../../theme/variables';
 
-.container-login{
+.container-register{
   width: 100%;
   min-height: 100vh;
   display: flex;
@@ -8,6 +8,12 @@
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
+
+
+  div{
+    width: 100%;
+    text-align: center;
+  }
 }
 
 form{
@@ -34,10 +40,6 @@ form{
 }
 
 img{
-  width: 30%;
+  width: 7em;
   height: 7em;
-}
-
-a{
-  margin-top: 100px;
 }

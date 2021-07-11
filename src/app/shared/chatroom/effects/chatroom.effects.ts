@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { ToastController } from '@ionic/angular';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { TranslateService } from '@ngx-translate/core';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { AuthActions } from '../../auth';
+import { catchError, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { AuthActions, fromAuth } from '../../auth';
 import { ChatroomActions } from '../actions';
 import { ChatroomService } from '../services/chatroom.service';
+import { select, Store } from '@ngrx/store';
 
 @Injectable()
 export class ChatroomEffects {
@@ -14,8 +15,11 @@ export class ChatroomEffects {
   loadChatrooms$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ChatroomActions.loadChatrooms),
-      switchMap(() =>
-        this._chatroom.getChatrooms().pipe(
+      withLatestFrom(
+        this.store.pipe(select(fromAuth.getUser))
+      ),
+      switchMap(([user]) =>
+        this._chatroom.getChatrooms((user as any)?.chats).pipe(
           map((chatrooms) => ChatroomActions.saveChatrooms({chatrooms: chatrooms || []}) ),
           catchError((error) => {
             // console.log(error)
@@ -29,8 +33,11 @@ export class ChatroomEffects {
   loadChatroomsLoginSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.loginSuccess, AuthActions.autologinSuccess),
-      switchMap(() =>
-        this._chatroom.getChatrooms().pipe(
+      withLatestFrom(
+        this.store.pipe(select(fromAuth.getUser))
+      ),
+      switchMap(([{user}]) =>
+        this._chatroom.getChatrooms((user as any)?.chats).pipe(
           map((chatrooms) => ChatroomActions.saveChatrooms({chatrooms: chatrooms || []}) ),
           catchError((error) => {
             // console.log(error)
@@ -86,15 +93,23 @@ export class ChatroomEffects {
     )
   );
 
-  messageFailureAuth$ = createEffect(() =>
+  messageFailure$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ChatroomActions.saveMessageFailure, ChatroomActions.deleteMessageFailure),
       tap(({error}) => this.presentToast(this.translate.instant(error), 'danger')),
     ), { dispatch: false }
   );
 
+  messageSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ChatroomActions.deleteMessageSuccess),
+      tap(() => this.presentToast(this.translate.instant('COMMON.DELETE_MESSAGE_SUCCESS'), 'success')),
+    ), { dispatch: false }
+  );
+
 
   constructor(
+    private store: Store,
     private _chatroom: ChatroomService,
     private actions$: Actions,
     private translate: TranslateService,

@@ -8,7 +8,7 @@ ion-toolbar{
 
 form {
   // background:red;
-  --background:#232E3C;
+  --background:#0D1218;
   margin-top: 0px;
   width: 100%;
   height: 50px;
@@ -19,7 +19,7 @@ form {
   justify-content: space-around;
 
   ion-item, ion-input{
-    --background:#232E3C;
+    --background:#0D1218;
     width: 80%;
     height: 50px;
   }
@@ -32,20 +32,19 @@ form {
 ion-toolbar{
   ion-avatar{
     margin-left: 4%;
-    width: 30%;
+    width: 2.5em;
     height: 2.5em;
   }
 }
 
 ion-content{
   ion-avatar{
-    width:15%;
-    height:3em;
+    width: 3em;
+    height: 3em;
   }
 }
 
 ion-avatar{
-
 
   img{
     width:100%;
@@ -53,17 +52,24 @@ ion-avatar{
   }
 }
 
-.div-delete{
-  width:100%;
-  height:20px;
-  margin-top: -5%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+// .div-delete{
+//   width:100%;
+//   height:20px;
+//   margin-top: -5%;
+//   display: flex;
+//   flex-direction: row;
+//   flex-wrap: wrap;
+//   justify-content: flex-end;
 
-  ion-button{
-    width: 20%;
-    height:100%
-  }
+//   ion-button{
+//     width: 20%;
+//     height:100%
+//   }
+// }
+
+.delete-button{
+  width:25%;
+  height:20px;
+  justify-self: flex-end !important;
+  margin-left: auto;
 }

@@ -11,7 +11,8 @@ export class ChatroomService {
   constructor(private firebase: AngularFireDatabase) { }
 
 
-  getChatrooms(): Observable<any>{
+  getChatrooms(chats:any): Observable<any>{
+    // console.log(Object.values(chats))
     return this.firebase.list('/chatrooms').snapshotChanges().pipe(
       map(response => {
         return response.map(item => {
@@ -22,7 +23,7 @@ export class ChatroomService {
               name: (item.payload.toJSON() as any)?.name
             }
           }
-        })
+        }).filter(({$key}) => Object.values(chats).includes($key))
       }),
       catchError(error => {
         return throwError(error)

@@ -53,10 +53,12 @@ export class AuthEffects {
     )
   );
 
-  loginSuccess$ = createEffect(() =>
+  loginSuccessEffect$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.loginSuccess),
-      tap(() => this.presentToast(this.translate.instant('COMMON.LOGIN_SUCCESS'), 'success')),
+      tap(() => {
+        this.presentToast(this.translate.instant('COMMON.LOGIN_SUCCESS'), 'success')
+      }),
       tap(() => {
         this.router.navigate(['/home'])
       }),
@@ -112,5 +114,6 @@ export class AuthEffects {
     toast.present();
   }
 
-
+  // zaira@gmail.com
+  // test@gmail.com
 }

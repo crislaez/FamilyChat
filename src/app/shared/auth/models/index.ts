@@ -11,6 +11,7 @@ export interface User {
   ui?: string;
   create_at?: string
   avatar?: string;
+  chats?:any;
 }
 
 // export interface LoginApiResponse {

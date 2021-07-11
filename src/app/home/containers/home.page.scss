@@ -2,6 +2,9 @@
 
 ion-item{
   ion-avatar{
-    margin-left: -5%;
+    img{
+      width:3em;
+      height:3em;
+    }
   }
 }

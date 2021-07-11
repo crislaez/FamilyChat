@@ -103,7 +103,7 @@ export class HomePage {
 
   async presentActionSheet() {
     const actionSheet = await this.actionSheetController.create({
-      header: 'Edit',
+      // header: 'Edit',
       cssClass: 'my-custom-class',
       buttons: [{
         text: 'LogOut',

@@ -29,13 +29,13 @@ const chatroomReducer = createReducer(
   on(ChatroomActions.loadChatroom, (state) => ({...state, pending: true})),
   on(ChatroomActions.saveChatroom, (state, { chatroom }) => ({...state, chatroom, pending: false })),
 
-  on(ChatroomActions.saveMessage, (state) => ({...state, pending: true, pendingStatus:{ pending: true}})),
-  on(ChatroomActions.saveMessageFailure, (state, { error }) => ({...state, pending: false, pendingStatus:{ pending: false, error} })),
-  on(ChatroomActions.saveMessageSuccess, (state) => ({...state, pending: false, pendingStatus:{ pending: false} })),
+  on(ChatroomActions.saveMessage, (state) => ({...state, pendingStatus:{ pending: true}})),
+  on(ChatroomActions.saveMessageFailure, (state, { error }) => ({...state,  pendingStatus:{ pending: false, error} })),
+  on(ChatroomActions.saveMessageSuccess, (state) => ({...state, pendingStatus:{ pending: false} })),
 
-  on(ChatroomActions.deleteMessage, (state) => ({...state, pending: true, pendingStatus:{ pending: true}})),
-  on(ChatroomActions.deleteMessageFailure, (state, { error }) => ({...state, pending: false, pendingStatus:{ pending: false, error} })),
-  on(ChatroomActions.deleteMessageSuccess, (state) => ({...state, pending: false, pendingStatus:{ pending: false} })),
+  on(ChatroomActions.deleteMessage, (state) => ({...state, pendingStatus:{ pending: true}})),
+  on(ChatroomActions.deleteMessageFailure, (state, { error }) => ({...state, pendingStatus:{ pending: false, error} })),
+  on(ChatroomActions.deleteMessageSuccess, (state) => ({...state, pendingStatus:{ pending: false} })),
 
 );
 
