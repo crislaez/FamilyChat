@@ -36,9 +36,7 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
             <ng-container *ngIf="!(pending$ | async); else loader">
               <ng-container *ngIf="emptyObject(info?.messages); else noData">
                 <ion-card class="card-arrow" *ngFor="let message of getObjectKeys(info?.messages); trackBy: trackById" [ngClass]="{'right card-arrow-rigth': userLoger?.ui === info?.messages[message]?.ui, 'card-arrow-left':userLoger?.ui !== info?.messages[message]?.ui}" >
-
                   <ion-card-content >
-
                       <div class="displays-start width-max">
                         <ion-avatar>
                           <img [src]="info?.messages[message]?.avatar" (error)="errorImage($event, true)">
