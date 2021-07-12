@@ -4,7 +4,7 @@ import { ToastController } from '@ionic/angular';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { catchError, exhaustMap, map, tap } from 'rxjs/operators';
+import { catchError, exhaustMap, map, switchMap, tap } from 'rxjs/operators';
 import * as AuthActions from '../actions/auth.actions';
 import { AuthService } from '../services/auth.service';
 
@@ -78,8 +78,17 @@ export class AuthEffects {
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.logout, AuthActions.forceLogout),
-      tap(() => this._auth.logout()),
-      tap(() => this.router.navigate(['/login']))
+      switchMap(() =>
+        this._auth.logout().pipe(
+          tap(res => {
+            console.log(res)
+            this.router.navigate(['/login'])
+          }),
+          catchError((error) =>{
+            return of([])
+          })
+        )
+      )
     ), { dispatch: false }
   );
 

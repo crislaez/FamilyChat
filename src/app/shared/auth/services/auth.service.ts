@@ -20,35 +20,27 @@ export class AuthService {
   // private readonly iv = CryptoJS.enc.Utf8.parse("7712333123");
 
 
+
   constructor(private http: HttpClient, private auth: AngularFireAuth, private firebase: AngularFireDatabase) { }
 
 
   login(email: string, password: string): Observable<any> {
-
     return from(this.logintWhitFirebase(email, password)).pipe(
       switchMap((response) => {
-        if(response?.error){
-          return throwError({error: response?.error}) //forzar el error
-         }
+        if(response?.error) return throwError({error: response?.error})
 
-        return this.firebase.list('/users').snapshotChanges().pipe(
-          map(users => {
-
-            if(!response) throw throwError({error: response?.error})  //hay que colocar esto aqui porque se recarga esta funcion de firebase
-
-            const loginUi = response?.userCredential?.user?.uid
-            const userLogIn = users.find((user: any) => user?.payload.toJSON().ui === loginUi)
-
+        return this.firebase.list('/users', ref => ref.orderByChild('ui').equalTo(response?.userCredential?.user?.uid)).valueChanges().pipe(
+          map(([user]) => {
             this.saveLocalToken(response?.userCredential?.user?.uid);
-            response = null //hay que colocar esto aqui porque se recarga esta funcion de firebase
-            return {
-              $key: userLogIn?.key,
-              name: (userLogIn.payload.toJSON() as any)?.name,
-              email: (userLogIn.payload.toJSON() as any)?.email,
-              ui: (userLogIn.payload.toJSON() as any)?.ui,
-              create_at: (userLogIn.payload.toJSON() as any)?.create_at,
-              avatar: (userLogIn.payload.toJSON() as any)?.avatar,
-              chats: (userLogIn.payload.toJSON() as any)?.chats || ''
+
+            return  {
+              $key: response?.userCredential?.user?.uid,
+              name: (user as any)?.name,
+              email: (user as any)?.email,
+              ui: (user as any)?.ui,
+              create_at: (user as any)?.create_at,
+              avatar: (user as any)?.avatar,
+              chats: (user as any)?.chats || ''
             }
           })
         )
@@ -73,20 +65,21 @@ export class AuthService {
   autologin(): Observable<any> {
     return from(this.getLocalToken()).pipe(
       switchMap( (token) => {
-        this._token = token
+        this._token = token;
+
         if (!this._token) return throwError({ message: 'Token not found' });
 
-        return this.firebase.list('/users').snapshotChanges().pipe(
-          map(users => {
-            const userLogIn = users.find((user: any) => user?.payload.toJSON().ui === token)
-            return {
-              $key: userLogIn?.key,
-              name: (userLogIn.payload.toJSON() as any)?.name,
-              email: (userLogIn.payload.toJSON() as any)?.email,
-              ui: (userLogIn.payload.toJSON() as any)?.ui,
-              create_at: (userLogIn.payload.toJSON() as any)?.create_at,
-              avatar: (userLogIn.payload.toJSON() as any)?.avatar,
-              chats: (userLogIn.payload.toJSON() as any)?.chats || ''
+        return this.firebase.list('/users', ref => ref.orderByChild('ui').equalTo(token)).valueChanges().pipe(
+          map(([user]) => {
+
+            return  {
+              $key: token,
+              name: (user as any)?.name,
+              email: (user as any)?.email,
+              ui: (user as any)?.ui,
+              create_at: (user as any)?.create_at,
+              avatar: (user as any)?.avatar,
+              chats: (user as any)?.chats || ''
             }
           })
         )
@@ -94,14 +87,14 @@ export class AuthService {
     )
   }
 
-  logout(): void {
-    // console.log(this.getLocalToken())
-    // console.log(this._token)
-    this.auth.signOut();
-    this.removeLocalToken()
-    this._token = null;
-    // console.log(this.getLocalToken())
-    // console.log(this._token)
+  logout(): Observable<any> {
+    return from(this.logOutFirebase()).pipe(
+      map(response =>{
+        this.removeLocalToken()
+        this._token = null;
+        return response
+      })
+    )
   }
 
   getUserInfo(credentials?: Credentials): Observable<User> {
@@ -128,7 +121,6 @@ export class AuthService {
       try{
         const newDate = new Date();
         const create_at = newDate.getTime();
-
         const response = await this.firebase.list('/users').push({name, email, password, ui, create_at, avatar:'', chats:['-Me4gjWhJZhxkwowxrvc']})
         return {response}
       }
@@ -137,6 +129,16 @@ export class AuthService {
       }
     }
     catch(error){
+      return {error: error.message}
+    }
+  }
+
+  //LOGOUT
+  async logOutFirebase(): Promise<any>{
+    try{
+      const response = await this.auth.signOut()
+      return response
+    }catch(error){
       return {error: error.message}
     }
   }
