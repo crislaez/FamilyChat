@@ -7,6 +7,7 @@ import { SharedModule } from '@familyChat/shared/shared/shared.module';
 import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { HomePage } from './containers/home.page';
+import { SearchPage } from './containers/search.page';
 import { HomePageRoutingModule } from './home-routing.module';
 
 @NgModule({
@@ -20,6 +21,9 @@ import { HomePageRoutingModule } from './home-routing.module';
     // AuthModule,
     // ChatroomModule
   ],
-  declarations: [HomePage]
+  declarations: [
+    HomePage,
+    SearchPage
+  ]
 })
 export class HomePageModule {}

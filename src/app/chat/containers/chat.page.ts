@@ -21,11 +21,17 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
           <ion-toolbar mode="md|ios">
             <ion-back-button defaultHref="/home" class="text-color" fill="clear" size="small" slot="start" [text]="''"></ion-back-button>
 
-            <ion-title class="text-color" slot="secondary" >{{info?.name}}</ion-title>
+            <ion-chip class="ion-margin-start">
+              <ion-avatar>
+                <img [src]="info?.image" (error)="errorImage($event)">
+              </ion-avatar>
+              <ion-label class="text-color" >{{info?.name}}</ion-label>
+            </ion-chip>
+            <!-- <ion-title class="text-color" slot="secondary" >{{info?.name}}</ion-title> -->
 
-            <ion-avatar>
+            <!-- <ion-avatar>
               <img [src]="info?.image" (error)="errorImage($event)">
-            </ion-avatar>
+            </ion-avatar> -->
           </ion-toolbar>
         </ion-header>
 
@@ -35,17 +41,17 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
             <ng-container *ngIf="!(pending$ | async); else loader">
               <ng-container *ngIf="emptyObject(info?.messages); else noData">
-                <ion-card class="card-arrow" *ngFor="let message of getObjectKeys(info?.messages); trackBy: trackById" [ngClass]="{'right card-arrow-rigth': userLoger?.ui === info?.messages[message]?.ui, 'card-arrow-left':userLoger?.ui !== info?.messages[message]?.ui}" >
+                <ion-card class="card-arrow fade-in-card" *ngFor="let message of getObjectKeys(info?.messages); trackBy: trackById" [ngClass]="{'right card-arrow-rigth': userLoger?.ui === info?.messages[message]?.ui, 'card-arrow-left':userLoger?.ui !== info?.messages[message]?.ui}" >
                   <ion-card-content >
-                      <div class="displays-start width-max">
-                        <ion-avatar>
-                          <img [src]="info?.messages[message]?.avatar" (error)="errorImage($event, true)">
-                        </ion-avatar>
+                    <div class="displays-start width-max">
+                      <ion-avatar>
+                        <img [src]="info?.messages[message]?.avatar" (error)="errorImage($event, true)">
+                      </ion-avatar>
 
-                        <div class="displays-center margin-left-5">{{info?.messages[message]?.name}}:</div>
-                        <ion-button *ngIf="userLoger?.ui === info?.messages[message]?.ui" fill="clear" class="text-color delete-button displays-center" (click)="deleteMessage(message)"><ion-icon class="font-big" name="close-outline"></ion-icon></ion-button>
+                      <div class="displays-center margin-left-5">{{info?.messages[message]?.name}}:</div>
+                      <ion-button *ngIf="userLoger?.ui === info?.messages[message]?.ui" fill="clear" class="text-color delete-button displays-center" (click)="deleteMessage(message)"><ion-icon class="font-big" name="close-outline"></ion-icon></ion-button>
 
-                      </div>
+                    </div>
 
                     <div class="margin-top">{{info?.messages[message]?.message}}</div>
                     <div class="margin-top font-small text-color-third">{{getTimeStamp(info?.messages[message]?.create_at) | date: 'MMMM d, h:mm a'}}</div>

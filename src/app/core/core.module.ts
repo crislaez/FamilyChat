@@ -7,6 +7,7 @@ import { RootComponent } from './layout/root.page';
 import { RouterModule } from '@angular/router';
 import { AuthModule } from '@familyChat/shared/auth/auth.module';
 import { ChatroomModule } from '@familyChat/shared/chatroom/chatroom.module';
+import { UserModule } from '@familyChat/shared/user/user.module';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { ChatroomModule } from '@familyChat/shared/chatroom/chatroom.module';
     RouterModule,
     TranslateModule.forChild(),
     AuthModule,
-    ChatroomModule
+    ChatroomModule,
+    UserModule
   ],
   declarations: [RootComponent]
 })

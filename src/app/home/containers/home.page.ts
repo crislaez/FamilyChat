@@ -6,6 +6,9 @@ import { AuthActions } from '@familyChat/shared/auth';
 import { select, Store } from '@ngrx/store';
 import { Chatroom, fromChatroom } from '@familyChat/shared/chatroom';
 import { Observable } from 'rxjs';
+import { ModalController } from '@ionic/angular';
+import { SearchPage } from './search.page';
+
 
 @Component({
   selector: 'app-home',
@@ -14,9 +17,11 @@ import { Observable } from 'rxjs';
     <ion-toolbar mode="md|ios">
       <ion-title class="text-color" >{{'COMMON.TITLE' | translate}}</ion-title>
 
+      <ion-button fill="clear" size="small" slot="end" (click)="presentModal()">
+        <ion-icon class="text-color" name="search-outline"></ion-icon>
+      </ion-button>
+
       <ion-button fill="clear" size="small" slot="end" (click)="presentActionSheet()">
-        <!-- <ion-icon class="text-color" name="menu-outline"></ion-icon> -->
-        <!-- <ion-icon class="text-color" name="settings-outline"></ion-icon> -->
         <ion-icon class="text-color" name="ellipsis-vertical-outline"></ion-icon>
       </ion-button>
     </ion-toolbar>
@@ -30,7 +35,6 @@ import { Observable } from 'rxjs';
         <ng-container *ngIf="!(pending$ | async); else loader">
           <ng-container *ngIf="chatrooms?.length > 0; else noData">
 
-          <!-- class="fade-in-card" -->
             <ion-list>
               <ion-item class="text-color" *ngFor="let chatroom of chatrooms; trackBy: trackById" [routerLink]="['/chat/'+chatroom?.$key]">
                 <ion-avatar slot="start">
@@ -38,13 +42,9 @@ import { Observable } from 'rxjs';
                 </ion-avatar>
                 <ion-label>
                   <h2>{{chatroom?.value?.name}}</h2>
-                  <!-- <p>-</p>
-                  <p>-</p> -->
                 </ion-label>
               </ion-item>
             </ion-list>
-
-
           </ng-container>
         </ng-container>
       </ng-container>
@@ -90,7 +90,7 @@ export class HomePage {
   chatrooms$: Observable<Chatroom[]> = this.store.pipe(select(fromChatroom.getChatrooms));
 
 
-  constructor(public actionSheetController: ActionSheetController, private store: Store) {
+  constructor(public actionSheetController: ActionSheetController, private store: Store, private modalController: ModalController) {
     // this.chatrooms$.subscribe(data => console.log(data))
   }
 
@@ -116,6 +116,14 @@ export class HomePage {
     });
     await actionSheet.present();
     const { role } = await actionSheet.onDidDismiss();
+  }
+
+  async presentModal() {
+    const modal = await this.modalController.create({
+      component: SearchPage,
+      cssClass: 'my-custom-class'
+    });
+    return await modal.present();
   }
 
 }
