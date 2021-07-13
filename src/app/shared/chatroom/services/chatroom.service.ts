@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { from, Observable, throwError, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { User } from '../../user/models';
+
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +18,7 @@ export class ChatroomService {
     return this.firebase.list('/chatrooms').snapshotChanges().pipe(
       map(response => {
         return response.map(item => {
+          console.log(item)
           return {
             $key:item?.key,
             value:{
@@ -70,6 +73,17 @@ export class ChatroomService {
     )
   }
 
+  createChatroom(user: User, userLogin: User): Observable<any>{
+    return from(this.createChatroomWhitFirebase(user, userLogin)).pipe(
+      map(response => {
+        if(response?.error){
+          throw throwError({error: response?.error}) //forzar el error
+        }
+        return response
+      })
+    )
+  }
+
   async saveMessage(message: any, key:string): Promise<any>{
     try{
       const response = await this.firebase.list(`/chatrooms/${key}/messages`).push(message)
@@ -108,5 +122,30 @@ export class ChatroomService {
     }
   }
 
+  async createChatroomWhitFirebase(user: User, userLogin: User): Promise<any>{
+    try{
+      console.log(user) //"-MeVqWKax-aQ4nWB6ff0" -MeVqWKax-aQ4nWB6ff0
+      console.log(userLogin) //"RkPSa7aeUbRmTkPpCJaMWHQJH773"  -MeHP3vs6ZG2JH2UfZfA
+
+      const message = {
+        image:'',
+        messages:'',
+        name:''
+      }
+
+      const responseCreateChat = await this.firebase.list(`/chatrooms`).push({ image:'',
+        messages:'',
+        name:''
+      })
+
+      console.log(responseCreateChat?.key)
+      const responseUserPushChat = await this.firebase.list(`/users/${user?.$key}/chats`).push(responseCreateChat?.key)
+      const responseUserloginPushChat = await this.firebase.list(`/users/${userLogin?.$key}/chats`).push(responseCreateChat?.key)
+      return {responseCreateChat}
+    }
+    catch(error){
+      return {error: error.message}
+    }
+  }
 
 }

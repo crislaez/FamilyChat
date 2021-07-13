@@ -25,6 +25,7 @@
     "ALERT":"Alerta",
     "ALERT_DELETE_MESSAGE":"¿Estás seguro que quieres borrar el mensaje?",
     "DELETE_MESSAGE_SUCCESS":"Mensaje borrado",
+    "CREATE_CHAT_ERROR":"Error al habrir el chat",
     "SERACH_USER":"Buscar usuario...",
     "YES":"Si",
     "NO":"No"

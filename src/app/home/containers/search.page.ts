@@ -6,10 +6,10 @@ import { Store, select } from '@ngrx/store';
 import { gotToTop, trackById, errorImage } from '@familyChat/shared/shared/utils/utils';
 import { Observable, combineLatest } from 'rxjs';
 import { startWith, switchMap, map } from 'rxjs/operators';
-import { fromUser, UserActions} from '@familyChat/shared/user';
+import { fromUser, UserActions, User } from '@familyChat/shared/user';
 import { ModalController } from '@ionic/angular';
-
-
+import { ChatroomActions } from '@familyChat/shared/chatroom';
+import { fromAuth } from '@familyChat/shared/auth';
 
 @Component({
   selector: 'app-search.page',
@@ -31,27 +31,32 @@ import { ModalController } from '@ionic/angular';
         </form>
       </div>
 
-      <ng-container *ngIf="(info$ | async) as info">
-        <ng-container *ngIf="!(pending$ | async); else loader">
-          <ng-container *ngIf="info?.users?.length > 0 ; else noData">         <!-- && (status$ | async) === 'success' -->
+      <ng-container *ngIf="(userLogin$ | async) as userLogin">
+        <ng-container *ngIf="(info$ | async) as info">
+          <ng-container *ngIf="!(pending$ | async); else loader">
+            <ng-container *ngIf="info?.users?.length > 0 ; else noData">         <!-- && (status$ | async) === 'success' -->
 
-            <ion-card class="fade-in-card width-max" *ngFor="let user of info?.users; trackBy: trackById">
-              <ion-card-header class="displays-around">
-                <ion-avatar>
-                  <img [src]="user?.avatar" (error)="errorImage($event, true)">
-                </ion-avatar>
-                <span class="text-color">{{user?.name}}</span>
-              </ion-card-header>
-            </ion-card>
+              <ng-container *ngFor="let user of info?.users; trackBy: trackById" >
+                <ion-card *ngIf="user?.ui !== userLogin?.ui" class="ion-activatable ripple-parent fade-in-card width-max" (click)="createChatroomWhitUser(user)" >
+                  <ion-card-header class="displays-between">
+                    <ion-avatar>
+                      <img [src]="user?.avatar" (error)="errorImage($event, true)">
+                    </ion-avatar>
+                    <span class="text-color">{{user?.name}}</span>
+                  </ion-card-header>
 
-            <!-- INFINITE SCROLL  -->
-            <ng-container *ngIf="info?.total as total">
-              <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event, total)">
-                <ion-infinite-scroll-content color="primary" class="loadingspinner">
-                </ion-infinite-scroll-content>
-              </ion-infinite-scroll>
+                  <ion-ripple-effect></ion-ripple-effect>
+                </ion-card>
+              </ng-container>
+              <!-- INFINITE SCROLL  -->
+              <ng-container *ngIf="info?.total as total">
+                <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event, total)">
+                  <ion-infinite-scroll-content color="primary" class="loadingspinner">
+                  </ion-infinite-scroll-content>
+                </ion-infinite-scroll>
+              </ng-container>
+
             </ng-container>
-
           </ng-container>
         </ng-container>
       </ng-container>
@@ -97,6 +102,7 @@ export class SearchPage{
 
   searchValue$ = new EventEmitter();
   infiniteScroll$ = new EventEmitter();
+  userLogin$: Observable<User> = this.store.pipe(select(fromAuth.getUser));
   status$: Observable<string> = this.store.pipe(select(fromUser.getStatus));
   pending$: Observable<boolean> = this.store.pipe(select(fromUser.getPending));
 
@@ -126,6 +132,7 @@ export class SearchPage{
 
   constructor(private store: Store, public platform: Platform, private modalController: ModalController) {
     this.info$.subscribe(data => console.log(data))
+    this.userLogin$.subscribe(data => console.log(data))
   }
 
 
@@ -142,13 +149,14 @@ export class SearchPage{
     if(!this.platform.is('mobileweb')) Keyboard.hide();
     this.search.reset();
     this.searchValue$.next('');
-     this.clearAll();
+    this.clearAll();
   }
 
   // INIFINITE SCROLL
   loadData(event, total) {
     setTimeout(() => {
       this.perPage = this.perPage + 20;
+      console.log(this.perPage, total)
       if(this.perPage >= total){
         if(this.ionInfiniteScroll) this.ionInfiniteScroll.disabled = true
       }
@@ -182,11 +190,15 @@ export class SearchPage{
     else this.showButton = false
   }
 
+  // CLOSE MODAL
   dismiss() {
-    // using the injected ModalController this page
-    // can "dismiss" itself and optionally pass back data
     this.modalController.dismiss({
       'dismissed': true
     });
   }
+
+  createChatroomWhitUser(user: User): void{
+    this.store.dispatch(ChatroomActions.createChatroom({user}))
+  }
+
 }

@@ -29,18 +29,18 @@ export class AuthService {
       switchMap((response) => {
         if(response?.error) return throwError({error: response?.error})
 
-        return this.firebase.list('/users', ref => ref.orderByChild('ui').equalTo(response?.userCredential?.user?.uid)).valueChanges().pipe(
+        return this.firebase.list('/users', ref => ref.orderByChild('ui').equalTo(response?.userCredential?.user?.uid)).snapshotChanges().pipe(
           map(([user]) => {
             this.saveLocalToken(response?.userCredential?.user?.uid);
 
             return  {
-              $key: response?.userCredential?.user?.uid,
-              name: (user as any)?.name,
-              email: (user as any)?.email,
-              ui: (user as any)?.ui,
-              create_at: (user as any)?.create_at,
-              avatar: (user as any)?.avatar,
-              chats: (user as any)?.chats || ''
+              $key: user?.key,
+              name: (user?.payload.toJSON() as any)?.name,
+              email: (user?.payload.toJSON() as any)?.email,
+              ui: (user?.payload.toJSON() as any)?.ui,
+              create_at: (user?.payload.toJSON() as any)?.create_at,
+              avatar: (user?.payload.toJSON() as any)?.avatar,
+              chats: (user?.payload.toJSON() as any)?.chats || ''
             }
           })
         )
@@ -69,17 +69,17 @@ export class AuthService {
 
         if (!this._token) return throwError({ message: 'Token not found' });
 
-        return this.firebase.list('/users', ref => ref.orderByChild('ui').equalTo(token)).valueChanges().pipe(
+        return this.firebase.list('/users', ref => ref.orderByChild('ui').equalTo(token)).snapshotChanges().pipe(
           map(([user]) => {
 
             return  {
-              $key: token,
-              name: (user as any)?.name,
-              email: (user as any)?.email,
-              ui: (user as any)?.ui,
-              create_at: (user as any)?.create_at,
-              avatar: (user as any)?.avatar,
-              chats: (user as any)?.chats || ''
+              $key: user?.key,
+              name: (user?.payload.toJSON() as any)?.name,
+              email: (user?.payload.toJSON() as any)?.email,
+              ui: (user?.payload.toJSON() as any)?.ui,
+              create_at: (user?.payload.toJSON() as any)?.create_at,
+              avatar: (user?.payload.toJSON() as any)?.avatar,
+              chats: (user?.payload.toJSON() as any)?.chats || ''
             }
           })
         )
@@ -121,7 +121,8 @@ export class AuthService {
       try{
         const newDate = new Date();
         const create_at = newDate.getTime();
-        const response = await this.firebase.list('/users').push({name, email, password, ui, create_at, avatar:'', chats:['-Me4gjWhJZhxkwowxrvc']})
+        const response = await this.firebase.list('/users').push({name, email, password, ui, create_at, avatar:'', chats:''})
+        const result = await await this.firebase.list(`/users/${response?.key}/chats`).push('-Me4gjWhJZhxkwowxrvc')
         return {response}
       }
       catch(error){

@@ -83,7 +83,7 @@ export class ChatroomEffects {
       ofType(ChatroomActions.deleteMessage),
       switchMap(({messageKey, key}) =>
         this._chatroom.deleteMessageByChatroom(messageKey, key).pipe(
-          map(() => ChatroomActions.deleteMessageSuccess({key}) ),
+          map(() => ChatroomActions.deleteMessageSuccess({key, message:'COMMON.DELETE_MESSAGE_SUCCESS'}) ),
           catchError((error) => {
             // console.log(error)
             return [ChatroomActions.deleteMessageFailure({error: 'COMMON.MESSAGE_DELETE_ERROR'}) ]
@@ -93,9 +93,27 @@ export class ChatroomEffects {
     )
   );
 
+  createChatroom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ChatroomActions.createChatroom),
+      withLatestFrom(
+        this.store.pipe(select(fromAuth.getUser))
+      ),
+      switchMap(([{user}, userLogin]) =>
+        this._chatroom.createChatroom(user, userLogin).pipe(
+          map(() => ChatroomActions.createChatroomSuccess() ),
+          catchError((error) => {
+            // console.log(error)
+            return [ChatroomActions.createChatroomFailure({error: 'COMMON.CREATE_CHAT_ERROR'}) ]
+          })
+        )
+      )
+    )
+  );
+
   messageFailure$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ChatroomActions.saveMessageFailure, ChatroomActions.deleteMessageFailure),
+      ofType(ChatroomActions.saveMessageFailure, ChatroomActions.deleteMessageFailure, ChatroomActions.createChatroomFailure),
       tap(({error}) => this.presentToast(this.translate.instant(error), 'danger')),
     ), { dispatch: false }
   );
@@ -103,7 +121,7 @@ export class ChatroomEffects {
   messageSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ChatroomActions.deleteMessageSuccess),
-      tap(() => this.presentToast(this.translate.instant('COMMON.DELETE_MESSAGE_SUCCESS'), 'success')),
+      tap(({message}) => this.presentToast(this.translate.instant(message), 'success')),
     ), { dispatch: false }
   );
 
