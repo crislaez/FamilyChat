@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-
+import { RouterModule, Routes } from '@angular/router';
+import { ChatGuard } from '@familyChat/shared/auth';
 import { ChatPage } from './containers/chat.page';
 
 const routes: Routes = [
@@ -9,7 +9,8 @@ const routes: Routes = [
     children:[
       {
         path: ':chatRoomKey',
-        component: ChatPage
+        component: ChatPage,
+        canActivate: [ChatGuard]
       }
     ]
   }

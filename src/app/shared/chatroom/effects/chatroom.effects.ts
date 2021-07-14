@@ -7,6 +7,9 @@ import { AuthActions, fromAuth } from '../../auth';
 import { ChatroomActions } from '../actions';
 import { ChatroomService } from '../services/chatroom.service';
 import { select, Store } from '@ngrx/store';
+import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
+
 
 @Injectable()
 export class ChatroomEffects {
@@ -14,16 +17,15 @@ export class ChatroomEffects {
 
   loadChatrooms$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ChatroomActions.loadChatrooms),
+      ofType(ChatroomActions.loadChatrooms, AuthActions.updateUser),
       withLatestFrom(
         this.store.pipe(select(fromAuth.getUser))
       ),
-      switchMap(([user]) =>
+      switchMap(([{user}]) =>
         this._chatroom.getChatrooms((user as any)?.chats).pipe(
-          map((chatrooms) => ChatroomActions.saveChatrooms({chatrooms: chatrooms || []}) ),
+          map((chatrooms) => ChatroomActions.saveChatrooms({chatrooms: chatrooms || [], statusChatrooms:'success'}) ),
           catchError((error) => {
-            // console.log(error)
-            return [ChatroomActions.saveChatrooms({chatrooms: []}) ]
+            return [ChatroomActions.saveChatrooms({chatrooms: [], statusChatrooms:'error'}) ]
           })
         )
       )
@@ -38,10 +40,9 @@ export class ChatroomEffects {
       ),
       switchMap(([{user}]) =>
         this._chatroom.getChatrooms((user as any)?.chats).pipe(
-          map((chatrooms) => ChatroomActions.saveChatrooms({chatrooms: chatrooms || []}) ),
+          map((chatrooms) => ChatroomActions.saveChatrooms({chatrooms: chatrooms || [], statusChatrooms:'success'}) ),
           catchError((error) => {
-            // console.log(error)
-            return [ChatroomActions.saveChatrooms({chatrooms: []}) ]
+            return [ChatroomActions.saveChatrooms({chatrooms: [], statusChatrooms:'error'}) ]
           })
         )
       )
@@ -53,10 +54,9 @@ export class ChatroomEffects {
       ofType(ChatroomActions.loadChatroom, ChatroomActions.saveMessageSuccess, ChatroomActions.deleteMessageSuccess),
       switchMap(({key}) =>
         this._chatroom.getChatroomByKey(key).pipe(
-          map((chatroom) => ChatroomActions.saveChatroom({chatroom: chatroom || {}}) ),
+          map((chatroom) => ChatroomActions.saveChatroom({chatroom: chatroom || {}, statusChatroom:'success'}) ),
           catchError((error) => {
-            // console.log(error)
-            return [ChatroomActions.saveChatroom({chatroom: {}}) ]
+            return [ChatroomActions.saveChatroom({chatroom: {}, statusChatroom:'error'}) ]
           })
         )
       )
@@ -101,7 +101,7 @@ export class ChatroomEffects {
       ),
       switchMap(([{user}, userLogin]) =>
         this._chatroom.createChatroom(user, userLogin).pipe(
-          map(() => ChatroomActions.createChatroomSuccess() ),
+          map((chatkey) => ChatroomActions.createChatroomSuccess({chatkey:chatkey}) ),
           catchError((error) => {
             // console.log(error)
             return [ChatroomActions.createChatroomFailure({error: 'COMMON.CREATE_CHAT_ERROR'}) ]
@@ -109,6 +109,16 @@ export class ChatroomEffects {
         )
       )
     )
+  );
+
+  createChatroomSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ChatroomActions.createChatroomSuccess),
+      tap(({chatkey}) => {
+        this.dismiss();
+        this.router.navigate(['/chat/'+chatkey])
+      }),
+    ), { dispatch: false }
   );
 
   messageFailure$ = createEffect(() =>
@@ -126,12 +136,21 @@ export class ChatroomEffects {
   );
 
 
+  private dismiss() {
+    this.modalController.dismiss({
+      'dismissed': true
+    });
+  }
+
+
   constructor(
     private store: Store,
+    private router: Router,
     private _chatroom: ChatroomService,
     private actions$: Actions,
     private translate: TranslateService,
-    public toastController: ToastController
+    public toastController: ToastController,
+    private modalController: ModalController
   ){}
 
 

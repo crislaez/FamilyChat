@@ -3,6 +3,8 @@
     "TITLE":"Family chat",
     "CHAT_TITLE":"CHATS",
     "NORESULT":"No hay datos",
+    "NO_CONTACT":"No hay contactos",
+    "ERROR":"Ha ocurrido un error, desliza hacia abajo para recargar",
     "REGISTER_ERROR":"Error en el registro",
     "LOGIN_ERROR":"Correo o clave incorrectos",
     "NAME":"Nombre...",
@@ -27,6 +29,7 @@
     "DELETE_MESSAGE_SUCCESS":"Mensaje borrado",
     "CREATE_CHAT_ERROR":"Error al habrir el chat",
     "SERACH_USER":"Buscar usuario...",
+    "NOT_MESSAGES":"Aún no hay mensajes",
     "YES":"Si",
     "NO":"No"
   },

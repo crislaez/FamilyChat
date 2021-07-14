@@ -6,4 +6,5 @@ export interface User{
   create_at?: string
   avatar?: string;
   chats?:any;
+  type?:any;
 }

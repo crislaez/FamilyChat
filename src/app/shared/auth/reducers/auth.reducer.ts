@@ -24,7 +24,7 @@ const initialState: State = {
 const authReducer = createReducer(
   initialState,
   on(AuthActions.login, AuthActions.autologin,  state => ({ ...state, loginStatus:{pending: true}  })),
-  on(AuthActions.loginSuccess, AuthActions.autologinSuccess, (state, { user }) => ({ ...state, loginStatus:{pending: false} , user })),
+  on(AuthActions.loginSuccess, AuthActions.autologinSuccess, AuthActions.updateUser, (state, { user }) => ({ ...state, loginStatus:{pending: false} , user })),
   on(AuthActions.loginFailure, AuthActions.autologinFailure, (state, { error }) => ({ ...state, loginStatus:{pending: false, error} })),
 
   on(AuthActions.register,  state => ({ ...state, loginStatus:{pending: true} })),
@@ -39,13 +39,10 @@ export function reducer(state: State | undefined, action: AuthActions.AuthAction
   return authReducer(state, action);
 }
 
-// export const isLoginPending = (state: State) => !!state?.loginStatus?.pending;
+
 export const isLoginPending = (state: State) => state?.loginStatus?.pending;
-
 export const getUser = (state: State) => state?.user;
-
 export const getUserId = (state: State) => state?.user?.$key;
-
 export const getLoginStatusPending = (state: State) => state?.loginStatus?.pending;
 
 

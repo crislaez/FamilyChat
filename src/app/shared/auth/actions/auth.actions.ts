@@ -17,6 +17,8 @@ export const registerFailure = createAction('[Auth] Register failure', props<{ e
 export const logout = createAction('[Auth] Logout');
 export const forceLogout = createAction('[Auth] Force logout');
 
+export const updateUser = createAction('[Auth] Update user', props<{ user: User }>());
+
 const all = union({
   login,
   loginFailure,

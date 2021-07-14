@@ -14,17 +14,17 @@ export class ChatroomService {
 
 
   getChatrooms(chats:any): Observable<any>{
-    // console.log(Object.values(chats))
     return this.firebase.list('/chatrooms').snapshotChanges().pipe(
       map(response => {
         return response.map(item => {
-          console.log(item)
+
           return {
             $key:item?.key,
             value:{
               image: (item.payload.toJSON() as any)?.image,
               name: (item.payload.toJSON() as any)?.name
             }
+
           }
         }).filter(({$key}) => Object.values(chats).includes($key))
       }),
@@ -79,7 +79,7 @@ export class ChatroomService {
         if(response?.error){
           throw throwError({error: response?.error}) //forzar el error
         }
-        return response
+        return response?.responseCreateChat?.key
       })
     )
   }
@@ -124,21 +124,21 @@ export class ChatroomService {
 
   async createChatroomWhitFirebase(user: User, userLogin: User): Promise<any>{
     try{
-      console.log(user) //"-MeVqWKax-aQ4nWB6ff0" -MeVqWKax-aQ4nWB6ff0
-      console.log(userLogin) //"RkPSa7aeUbRmTkPpCJaMWHQJH773"  -MeHP3vs6ZG2JH2UfZfA
 
       const message = {
-        image:'',
+        image:{
+          [user?.$key]:user?.avatar,
+          [userLogin?.$key]:userLogin?.avatar,
+        },
         messages:'',
-        name:''
+        name:{
+          [user?.$key]:user?.name,
+          [userLogin?.$key]:userLogin?.name,
+        }
       }
 
-      const responseCreateChat = await this.firebase.list(`/chatrooms`).push({ image:'',
-        messages:'',
-        name:''
-      })
+      const responseCreateChat = await this.firebase.list(`/chatrooms`).push(message)
 
-      console.log(responseCreateChat?.key)
       const responseUserPushChat = await this.firebase.list(`/users/${user?.$key}/chats`).push(responseCreateChat?.key)
       const responseUserloginPushChat = await this.firebase.list(`/users/${userLogin?.$key}/chats`).push(responseCreateChat?.key)
       return {responseCreateChat}

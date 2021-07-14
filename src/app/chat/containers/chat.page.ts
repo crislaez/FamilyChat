@@ -14,7 +14,7 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
   selector: 'app-chat',
   template: `
   <ng-container *ngIf="(info$ | async) as info; else loading">
-    <ng-container *ngIf="info; else noData">
+    <ng-container *ngIf="info; else error">
       <ng-container *ngIf="(userLoger$ | async) as userLoger">
 
         <ion-header no-border >
@@ -23,15 +23,23 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
             <ion-chip class="ion-margin-start">
               <ion-avatar>
-                <img [src]="info?.image" (error)="errorImage($event)">
-              </ion-avatar>
-              <ion-label class="text-color" >{{info?.name}}</ion-label>
-            </ion-chip>
-            <!-- <ion-title class="text-color" slot="secondary" >{{info?.name}}</ion-title> -->
+                <ng-container *ngIf="emptyObject(info?.image); else publicChatImage">
+                  <img [src]="info?.image[getOtherUser(info?.image, userLoger?.$key)]" loading="lazy" (error)="errorImage($event)">
+                </ng-container>
 
-            <!-- <ion-avatar>
-              <img [src]="info?.image" (error)="errorImage($event)">
-            </ion-avatar> -->
+                <ng-template #publicChatImage>
+                  <img [src]="info?.image" (error)="errorImage($event)">
+                </ng-template>
+              </ion-avatar>
+
+              <ng-container *ngIf="emptyObject(info?.name); else publicChatName">
+                <ion-label class="text-color" >{{info?.name[getOtherUser(info?.name, userLoger?.$key)]}}</ion-label>
+              </ng-container>
+              <ng-template  #publicChatName>
+                <ion-label class="text-color" >{{info?.name}}</ion-label>
+              </ng-template>
+            </ion-chip>
+
           </ion-toolbar>
         </ion-header>
 
@@ -40,29 +48,43 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
           <div class="container components-color-second">
 
             <ng-container *ngIf="!(pending$ | async); else loader">
-              <ng-container *ngIf="emptyObject(info?.messages); else noData">
-                <ion-card class="card-arrow fade-in-card" *ngFor="let message of getObjectKeys(info?.messages); trackBy: trackById" [ngClass]="{'right card-arrow-rigth': userLoger?.ui === info?.messages[message]?.ui, 'card-arrow-left':userLoger?.ui !== info?.messages[message]?.ui}" >
-                  <ion-card-content >
-                    <div class="displays-start width-max">
-                      <ion-avatar>
-                        <img [src]="info?.messages[message]?.avatar" (error)="errorImage($event, true)">
-                      </ion-avatar>
+              <ng-container *ngIf="(statusChatroom$ | async) === 'success'; else serverError">
+                <ng-container *ngIf="emptyObject(info?.messages); else noData">
+                  <ion-card class="card-arrow fade-in-card" *ngFor="let message of getObjectKeys(info?.messages); trackBy: trackById" [ngClass]="{'right card-arrow-rigth': userLoger?.ui === info?.messages[message]?.ui, 'card-arrow-left':userLoger?.ui !== info?.messages[message]?.ui}" >
+                    <ion-card-content >
+                      <div class="displays-start width-max">
+                        <ion-avatar>
+                          <img [src]="info?.messages[message]?.avatar" loading="lazy" (error)="errorImage($event, true)">
+                        </ion-avatar>
 
-                      <div class="displays-center margin-left-5">{{info?.messages[message]?.name}}:</div>
-                      <ion-button *ngIf="userLoger?.ui === info?.messages[message]?.ui" fill="clear" class="text-color delete-button displays-center" (click)="deleteMessage(message)"><ion-icon class="font-big" name="close-outline"></ion-icon></ion-button>
+                        <div class="displays-center margin-left-5">{{info?.messages[message]?.name}}:</div>
+                        <ion-button *ngIf="userLoger?.ui === info?.messages[message]?.ui" fill="clear" class="text-color delete-button displays-center" (click)="deleteMessage(message)"><ion-icon class="font-big" name="close-outline"></ion-icon></ion-button>
+                      </div>
 
-                    </div>
-
-                    <div class="margin-top">{{info?.messages[message]?.message}}</div>
-                    <div class="margin-top font-small text-color-third">{{getTimeStamp(info?.messages[message]?.create_at) | date: 'MMMM d, h:mm a'}}</div>
-                  </ion-card-content>
-                </ion-card>
+                      <div class="margin-top">{{info?.messages[message]?.message}}</div>
+                      <div class="margin-top font-small text-color-third">{{getTimeStamp(info?.messages[message]?.create_at) | date: 'MMMM d, h:mm a'}}</div>
+                    </ion-card-content>
+                  </ion-card>
+                </ng-container>
               </ng-container>
             </ng-container>
 
             <ng-template #noData>
               <div class="error-serve">
-                <span class="text-color">{{'COMMON.NORESULT' | translate}}</span>
+                <div>
+                  <span class="text-color">{{'COMMON.NOT_MESSAGES' | translate}}</span>
+                </div>
+              </div>
+            </ng-template>
+
+            <!-- IS ERROR -->
+            <ng-template #serverError>
+              <div class="error-serve">
+                <div>
+                  <span><ion-icon class="text-color big-size" name="cloud-offline-outline"></ion-icon></span>
+                  <br>
+                  <span class="text-color">{{'COMMON.ERROR' | translate}}</span>
+                </div>
               </div>
             </ng-template>
 
@@ -92,7 +114,7 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 
 
-  <ng-template #noData>
+  <ng-template #error>
     <ion-header no-border >
       <ion-toolbar mode="md|ios">
         <ion-title class="text-color" >{{'COMMON.CHAT_TITLE' | translate}}</ion-title>
@@ -103,7 +125,9 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
     <ion-content [fullscreen]="true" >
       <div class="container components-color-third">
         <div class="error-serve">
-          <span class="text-color">{{'COMMON.NORESULT' | translate}}</span>
+          <div>
+            <span class="text-color">{{'COMMON.NORESULT' | translate}}</span>
+          </div>
         </div>
       </div>
     </ion-content>
@@ -126,11 +150,13 @@ export class ChatPage implements OnInit, OnDestroy{
   @ViewChild('content') private content: any;
   trackById = trackById;
   errorImage = errorImage;
-  emptyObject = emptyObject
+  emptyObject = emptyObject;
+
   private ngUnsubscribe$ = new Subject<void>();
   pendingStatus$: Observable<boolean> = this.store.pipe(select(fromChatroom.getPendingStatus));
   pending$: Observable<boolean> = this.store.pipe(select(fromChatroom.getPending));
-  userLoger$: Observable<any> = this.store.pipe(select(fromAuth.getUser))
+  statusChatroom$: Observable<string> = this.store.pipe(select(fromChatroom.getStatusChatroom));
+  userLoger$: Observable<any> = this.store.pipe(select(fromAuth.getUser));
 
   info$: Observable<any> = this.route.params.pipe(
     filter(({chatRoomKey}) => !!chatRoomKey),
@@ -151,7 +177,7 @@ export class ChatPage implements OnInit, OnDestroy{
 
 
   constructor(private store: Store, private route: ActivatedRoute, public alertController: AlertController, private translate: TranslateService,) {
-    // this.info$.subscribe(data => console.log(data?.messages))
+    // this.statusChatroom$.subscribe(data => console.log(data))
   }
 
 
@@ -234,8 +260,11 @@ export class ChatPage implements OnInit, OnDestroy{
     });
 
     await alert.present();
-
     const { role } = await alert.onDidDismiss();
+  }
+
+  getOtherUser(chatroom, loginUser): any{
+    return (Object.keys(chatroom || {}) || []).filter(item => item !== loginUser) || '';
   }
 
 }

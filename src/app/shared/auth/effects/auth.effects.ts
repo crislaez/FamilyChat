@@ -17,7 +17,10 @@ export class AuthEffects {
       ofType(AuthActions.autologin),
       exhaustMap(() =>
         this._auth.autologin().pipe(
-          map((user) => AuthActions.autologinSuccess({ user }) ),
+          map((user) => {
+            if(user?.type === 'value') return AuthActions.autologinSuccess({ user })
+            return AuthActions.updateUser({ user })
+          }),
           catchError(error => [AuthActions.autologinFailure({ error })])
         )
       )
@@ -29,7 +32,10 @@ export class AuthEffects {
       ofType(AuthActions.login),
       exhaustMap(({ email, password }) =>
         this._auth.login(email, password).pipe(
-          map((user) => AuthActions.loginSuccess({ user }) ),
+          map((user) => {
+            if(user?.type === 'value') return AuthActions.loginSuccess({ user })
+            return AuthActions.updateUser({ user })
+          }),
           catchError((error) => {
             console.log(error)
             return [AuthActions.loginFailure({ error: 'COMMON.LOGIN_INVALID_CREDENTIALST' })]
@@ -81,7 +87,6 @@ export class AuthEffects {
       switchMap(() =>
         this._auth.logout().pipe(
           tap(res => {
-            console.log(res)
             this.router.navigate(['/login'])
           }),
           catchError((error) =>{

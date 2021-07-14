@@ -29,21 +29,7 @@ export class AuthService {
       switchMap((response) => {
         if(response?.error) return throwError({error: response?.error})
 
-        return this.firebase.list('/users', ref => ref.orderByChild('ui').equalTo(response?.userCredential?.user?.uid)).snapshotChanges().pipe(
-          map(([user]) => {
-            this.saveLocalToken(response?.userCredential?.user?.uid);
-
-            return  {
-              $key: user?.key,
-              name: (user?.payload.toJSON() as any)?.name,
-              email: (user?.payload.toJSON() as any)?.email,
-              ui: (user?.payload.toJSON() as any)?.ui,
-              create_at: (user?.payload.toJSON() as any)?.create_at,
-              avatar: (user?.payload.toJSON() as any)?.avatar,
-              chats: (user?.payload.toJSON() as any)?.chats || ''
-            }
-          })
-        )
+        return this.getUserInFirebase(response?.userCredential?.user?.uid, true)
       }),
       catchError((error) =>{
         return throwError(error?.error?.message)
@@ -69,20 +55,10 @@ export class AuthService {
 
         if (!this._token) return throwError({ message: 'Token not found' });
 
-        return this.firebase.list('/users', ref => ref.orderByChild('ui').equalTo(token)).snapshotChanges().pipe(
-          map(([user]) => {
-
-            return  {
-              $key: user?.key,
-              name: (user?.payload.toJSON() as any)?.name,
-              email: (user?.payload.toJSON() as any)?.email,
-              ui: (user?.payload.toJSON() as any)?.ui,
-              create_at: (user?.payload.toJSON() as any)?.create_at,
-              avatar: (user?.payload.toJSON() as any)?.avatar,
-              chats: (user?.payload.toJSON() as any)?.chats || ''
-            }
-          })
-        )
+        return this.getUserInFirebase(token,false)
+      }),
+      catchError((error) =>{
+        return throwError(error?.error?.message)
       })
     )
   }
@@ -97,8 +73,24 @@ export class AuthService {
     )
   }
 
-  getUserInfo(credentials?: Credentials): Observable<User> {
-    return of(credentials)
+  getUserInFirebase(UserLoginKey: string, sabeToken:boolean): Observable<any> {
+    return this.firebase.list('/users', ref => ref.orderByChild('ui').equalTo(UserLoginKey)).snapshotChanges().pipe(
+      map(([user]) => {
+        // console.log(user)
+        if(sabeToken) this.saveLocalToken(UserLoginKey);
+
+        return  {
+          $key: user?.key,
+          name: (user?.payload.toJSON() as any)?.name,
+          email: (user?.payload.toJSON() as any)?.email,
+          ui: (user?.payload.toJSON() as any)?.ui,
+          create_at: (user?.payload.toJSON() as any)?.create_at,
+          avatar: (user?.payload.toJSON() as any)?.avatar,
+          chats: (user?.payload.toJSON() as any)?.chats || '',
+          type:user?.type
+        }
+      })
+    )
   }
 
   // LOGIN FIREBASE
@@ -115,19 +107,15 @@ export class AuthService {
   // REGISTER FIREBASE
   async registerWhitFirebase(email:string, password:string, name:string): Promise<any>{
     try{
-      const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+      const userCredential = await this.auth.createUserWithEmailAndPassword(email, password); //registro Authentication
       const ui = userCredential?.user?.uid || '';
 
-      try{
-        const newDate = new Date();
-        const create_at = newDate.getTime();
-        const response = await this.firebase.list('/users').push({name, email, password, ui, create_at, avatar:'', chats:''})
-        const result = await await this.firebase.list(`/users/${response?.key}/chats`).push('-Me4gjWhJZhxkwowxrvc')
-        return {response}
-      }
-      catch(error){
-        return {error: error.message}
-      }
+      const newDate = new Date();
+      const create_at = newDate.getTime();
+      const response = await this.firebase.list('/users').push({name, email, password, ui, create_at, avatar:'', chats:''}) //crear usuario en RealTime database
+      const result = await await this.firebase.list(`/users/${response?.key}/chats`).push('-Me4gjWhJZhxkwowxrvc'); //agregar chat publico en campo chat recien creado
+
+      return {response}
     }
     catch(error){
       return {error: error.message}

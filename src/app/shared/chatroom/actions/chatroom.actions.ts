@@ -2,15 +2,15 @@ import { createAction, props, union} from '@ngrx/store';
 import { Chatroom } from '../models';
 import { User } from '../../user/models';
 
-export const loadChatrooms = createAction('[Chatroom] Load Chatrooms');
-export const saveChatrooms = createAction('[Chatroom] Save Chatrooms', props<{chatrooms: Chatroom[]}>());
+export const loadChatrooms = createAction('[Chatroom] Load Chatrooms', props<{user: User}>());
+export const saveChatrooms = createAction('[Chatroom] Save Chatrooms', props<{chatrooms: Chatroom[], statusChatrooms?:string}>());
 
 export const createChatroom = createAction('[Chatroom] Create Chatroom', props<{user: User}>());
-export const createChatroomFailure = createAction('[Chatroom] Create Chatroom Failure', props<{error: string}>());
-export const createChatroomSuccess = createAction('[Chatroom] Create Chatroom Success');
+export const createChatroomFailure = createAction('[Chatroom] Create Chatroom Failure', props<{error: string,}>());
+export const createChatroomSuccess = createAction('[Chatroom] Create Chatroom Success', props<{chatkey: string}>());
 
 export const loadChatroom = createAction('[Chatroom] Load Chatroom', props<{key: string}>());
-export const saveChatroom = createAction('[Chatroom] Save Chatroom', props<{chatroom: Chatroom}>());
+export const saveChatroom = createAction('[Chatroom] Save Chatroom', props<{chatroom: Chatroom, statusChatroom?:string}>());
 
 export const saveMessage = createAction('[Chatroom] Save Message', props<{message: any, key: string}>());
 export const saveMessageFailure = createAction('[Chatroom] Save Message Failure', props<{error: string }>());

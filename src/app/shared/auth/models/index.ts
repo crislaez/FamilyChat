@@ -12,9 +12,5 @@ export interface User {
   create_at?: string
   avatar?: string;
   chats?:any;
+  type?:any
 }
-
-// export interface LoginApiResponse {
-//   refresh_token?: string;
-//   access_token?: string;
-// }

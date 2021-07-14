@@ -13,7 +13,7 @@ import { UserService } from '../services/user.service';
 export class UserEffects {
 
 
-  loadChatrooms$ = createEffect(() =>
+  loadUsers$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.loadUsers),
       switchMap(() =>
@@ -28,7 +28,7 @@ export class UserEffects {
     )
   );
 
-  loadChatroomsLoginSuccess$ = createEffect(() =>
+  loadUsersSuccess$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.loginSuccess, AuthActions.autologinSuccess),
       switchMap(() =>

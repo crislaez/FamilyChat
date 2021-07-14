@@ -10,6 +10,7 @@ export const errorImage = (event, bool?:boolean): void => {
 }
 
 export const emptyObject = (object: any): boolean => {
+  if(typeof object !== 'object') return false
   return Object.keys(object || {})?.length > 0 ? true : false
 }
 

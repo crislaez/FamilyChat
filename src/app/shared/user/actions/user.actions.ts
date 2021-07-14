@@ -2,7 +2,7 @@ import { createAction, props, union} from '@ngrx/store';
 import { User } from '../models';
 
 export const loadUsers = createAction('[User] Load Users');
-export const saveUsers = createAction('[JUserob] Save Users', props<{users: User[], status?: string}>());
+export const saveUsers = createAction('[User] Save Users', props<{users: User[], status?: string}>());
 
 
 const all = union({

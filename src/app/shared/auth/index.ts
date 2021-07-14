@@ -5,4 +5,5 @@ export * from './services/auth.service';
 export * from './models';
 export { AuthGuard } from './guards/auth.guard';
 export { GuestGuard } from './guards/guest.guard';
+export { ChatGuard } from './guards/chat.guard';
 export { fromAuth }

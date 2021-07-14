@@ -11,6 +11,7 @@ import { ModalController } from '@ionic/angular';
 import { ChatroomActions } from '@familyChat/shared/chatroom';
 import { fromAuth } from '@familyChat/shared/auth';
 
+
 @Component({
   selector: 'app-search.page',
   template:`
@@ -34,28 +35,31 @@ import { fromAuth } from '@familyChat/shared/auth';
       <ng-container *ngIf="(userLogin$ | async) as userLogin">
         <ng-container *ngIf="(info$ | async) as info">
           <ng-container *ngIf="!(pending$ | async); else loader">
-            <ng-container *ngIf="info?.users?.length > 0 ; else noData">         <!-- && (status$ | async) === 'success' -->
+            <ng-container *ngIf="(status$ | async) === 'success'; else serverError">
+              <ng-container *ngIf="info?.users?.length > 0 ; else noData">         <!-- && (status$ | async) === 'success' -->
 
-              <ng-container *ngFor="let user of info?.users; trackBy: trackById" >
-                <ion-card *ngIf="user?.ui !== userLogin?.ui" class="ion-activatable ripple-parent fade-in-card width-max" (click)="createChatroomWhitUser(user)" >
-                  <ion-card-header class="displays-between">
-                    <ion-avatar>
-                      <img [src]="user?.avatar" (error)="errorImage($event, true)">
-                    </ion-avatar>
-                    <span class="text-color">{{user?.name}}</span>
-                  </ion-card-header>
+                <ng-container *ngFor="let user of info?.users; trackBy: trackById" >
+                  <ion-card *ngIf="user?.ui !== userLogin?.ui && checkIsHaveChatCreate(user?.chats, userLogin?.chats)" class="ion-activatable ripple-parent fade-in-card width-max" (click)="createChatroomWhitUser(user)" >
+                    <ion-card-header class="displays-between">
+                      <ion-avatar>
+                        <img [src]="user?.avatar" loading="lazy" (error)="errorImage($event, true)">
+                      </ion-avatar>
+                      <span class="text-color">{{user?.name}}</span>
+                    </ion-card-header>
 
-                  <ion-ripple-effect></ion-ripple-effect>
-                </ion-card>
+                    <ion-ripple-effect></ion-ripple-effect>
+                  </ion-card>
+                </ng-container>
+
+                <!-- INFINITE SCROLL  -->
+                <ng-container *ngIf="info?.total > 15">
+                  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event, info?.total)">
+                    <ion-infinite-scroll-content color="primary" class="loadingspinner">
+                    </ion-infinite-scroll-content>
+                  </ion-infinite-scroll>
+                </ng-container>
+
               </ng-container>
-              <!-- INFINITE SCROLL  -->
-              <ng-container *ngIf="info?.total as total">
-                <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event, total)">
-                  <ion-infinite-scroll-content color="primary" class="loadingspinner">
-                  </ion-infinite-scroll-content>
-                </ion-infinite-scroll>
-              </ng-container>
-
             </ng-container>
           </ng-container>
         </ng-container>
@@ -69,7 +73,20 @@ import { fromAuth } from '@familyChat/shared/auth';
       <!-- IS NO DATA  -->
       <ng-template #noData>
         <div class="error-serve">
-          <span class="text-second-color">{{'COMMON.NORESULT' | translate}}</span>
+          <div>
+            <span class="text-color">{{'COMMON.NORESULT' | translate}}</span>
+          </div>
+        </div>
+      </ng-template>
+
+      <!-- IS ERROR -->
+      <ng-template #serverError>
+        <div class="error-serve">
+          <div>
+            <span><ion-icon class="text-color big-size" name="cloud-offline-outline"></ion-icon></span>
+            <br>
+            <span class="text-color">{{'COMMON.ERROR' | translate}}</span>
+          </div>
         </div>
       </ng-template>
 
@@ -108,7 +125,7 @@ export class SearchPage{
 
   info$: Observable<any> = combineLatest([
     this.searchValue$.pipe(startWith('')),
-    this.infiniteScroll$.pipe(startWith(20))
+    this.infiniteScroll$.pipe(startWith(15))
   ]).pipe(
     switchMap(([search, perpage]) =>
       this.store.pipe(select(fromUser.getUsers),
@@ -131,8 +148,8 @@ export class SearchPage{
 
 
   constructor(private store: Store, public platform: Platform, private modalController: ModalController) {
-    this.info$.subscribe(data => console.log(data))
-    this.userLogin$.subscribe(data => console.log(data))
+    // this.info$.subscribe(data => console.log(data))
+    // this.userLogin$.subscribe(data => console.log(data))
   }
 
 
@@ -155,8 +172,7 @@ export class SearchPage{
   // INIFINITE SCROLL
   loadData(event, total) {
     setTimeout(() => {
-      this.perPage = this.perPage + 20;
-      console.log(this.perPage, total)
+      this.perPage = this.perPage + 15;
       if(this.perPage >= total){
         if(this.ionInfiniteScroll) this.ionInfiniteScroll.disabled = true
       }
@@ -175,11 +191,11 @@ export class SearchPage{
 
       event.target.complete();
     }, 500);
-    }
+  }
 
   //CLEAR
   clearAll(): void{
-    this.perPage = 20
+    this.perPage = 15
     this.infiniteScroll$.next(this.perPage)
     if(this.ionInfiniteScroll) this.ionInfiniteScroll.disabled = false
   }
@@ -200,5 +216,16 @@ export class SearchPage{
   createChatroomWhitUser(user: User): void{
     this.store.dispatch(ChatroomActions.createChatroom({user}))
   }
+
+  checkIsHaveChatCreate(userChats, userLoginChats): boolean{
+    let count = 0;
+    for(let chatValue of Object.values(userChats)){
+      if(Object.values(userLoginChats).includes(chatValue)) count ++
+    }
+
+    if(count === 1 || count === 0) return true
+    return false
+  }
+
 
 }
