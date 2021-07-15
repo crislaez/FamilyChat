@@ -3,10 +3,11 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { Storage } from '@capacitor/storage';
-import { from, Observable, of, throwError } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs/operators';
-import { Credentials, User } from '../models';
-// import * as CryptoJS from 'crypto-js';
+import * as CryptoJS from 'crypto-js';
+import { from, Observable, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { User } from '../models';
+
 
 @Injectable({
   providedIn: 'root',
@@ -16,9 +17,7 @@ export class AuthService {
 
   public _token: string;
   private readonly TOKEN_LABEL = 'API_FAMILYCHAT_TOKEN';
-  // private readonly key = CryptoJS.enc.Utf8.parse("11221123342123");
-  // private readonly iv = CryptoJS.enc.Utf8.parse("7712333123");
-
+  private readonly SECRET_KEY = {key:'SECRET_KEY:FAMILY_CHAT'}
 
 
   constructor(private http: HttpClient, private auth: AngularFireAuth, private firebase: AngularFireDatabase) { }
@@ -55,7 +54,15 @@ export class AuthService {
 
         if (!this._token) return throwError({ message: 'Token not found' });
 
-        return this.getUserInFirebase(token,false)
+        return this.getUserInFirebase(token,false).pipe(
+          map(response => {
+            if(!response?.$key) {
+              this.removeLocalToken() //borramos el token
+              throw throwError({error: 'error'}) //lanzamos un error para qeu valla al catch
+            }
+            return response
+          })
+        )
       }),
       catchError((error) =>{
         return throwError(error?.error?.message)
@@ -68,6 +75,17 @@ export class AuthService {
       map(response =>{
         this.removeLocalToken()
         this._token = null;
+        return response
+      })
+    )
+  }
+
+  unsubscribe(userLogin: User): Observable<any> {
+    return from(this.unsubscribeUserLoger(userLogin)).pipe(
+      map(response => {
+        if(response?.error){
+          throw throwError({error: response?.error})
+        }
         return response
       })
     )
@@ -112,7 +130,9 @@ export class AuthService {
 
       const newDate = new Date();
       const create_at = newDate.getTime();
-      const response = await this.firebase.list('/users').push({name, email, password, ui, create_at, avatar:'', chats:''}) //crear usuario en RealTime database
+      let encryptPassword = CryptoJS.SHA256(password, this.SECRET_KEY).toString();
+
+      const response = await this.firebase.list('/users').push({name, email, password:encryptPassword, ui, create_at, avatar:'', chats:''}) //crear usuario en RealTime database
       const result = await await this.firebase.list(`/users/${response?.key}/chats`).push('-Me4gjWhJZhxkwowxrvc'); //agregar chat publico en campo chat recien creado
 
       return {response}
@@ -122,7 +142,7 @@ export class AuthService {
     }
   }
 
-  //LOGOUT
+  //LOGOUT FIREBASE
   async logOutFirebase(): Promise<any>{
     try{
       const response = await this.auth.signOut()
@@ -132,23 +152,47 @@ export class AuthService {
     }
   }
 
+  // UNSUBSCRIBE FIREBASE
+  async unsubscribeUserLoger(userLogin: User): Promise<any>{
+
+    try{
+      const result = await this.firebase.list(`/users/${userLogin?.$key}`).remove()//borramos el usuario logueado
+      await (await this.auth.currentUser).delete(); //borrar usuario de Authentication
+
+      for await (let chatroomKey of Object.values(userLogin?.chats)){
+        if(chatroomKey !== '-Me4gjWhJZhxkwowxrvc'){
+          await this.firebase.list(`/chatrooms/${chatroomKey}`).remove() //borramos los chatrooms que tengan esos keys
+          // let result = await this.firebase.list('/users', ref => ref.orderByChild('chats').equalTo('') ).snapshotChanges().subscribe(data => console.log(data))
+          // .remove()
+          // allresult.push(result)
+        }
+      }
+
+      return {result}
+    }
+    catch(error){
+      return {error: error.message}
+    }
+  }
+
   //***************************** STORAGE *****************************
   // SAVE TOKEN
-  async saveLocalToken(token: string){
+  async saveLocalToken(token: string): Promise<any>{
     this._token = token
     await Storage.set({key: this.TOKEN_LABEL, value: token})
   }
 
   // GET TOKEN
-  async getLocalToken(){
+  async getLocalToken(): Promise<any>{
     const token = await Storage.get({key: this.TOKEN_LABEL})
     return await token?.value
   }
 
   // REMOVE TOKEN
-  async removeLocalToken(){
+  async removeLocalToken(): Promise<any>{
     await Storage.remove({key: this.TOKEN_LABEL})
   }
+
 
 
   // getHeaders(): HttpHeaders {

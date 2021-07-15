@@ -30,6 +30,10 @@
     "CREATE_CHAT_ERROR":"Error al habrir el chat",
     "SERACH_USER":"Buscar usuario...",
     "NOT_MESSAGES":"Aún no hay mensajes",
+    "UNSUBSCRIBE_FAILURE_MESSAGE":"A ocurrido un error al darte de baja",
+    "LOGOUT":"Cerrar sesión",
+    "UNSUBSCRIBE":"Darse de baja",
+    "UNSUBSCRIBE_CONFIRM_MESSAGE":"¿Estas seguro que quieres darte de baja?",
     "YES":"Si",
     "NO":"No"
   },

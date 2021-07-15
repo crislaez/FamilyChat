@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { fromAuth, User } from '@familyChat/shared/auth';
 import { ChatroomActions, fromChatroom } from '@familyChat/shared/chatroom';
 import { emptyObject, errorImage, trackById } from '@familyChat/shared/shared/utils/utils';
@@ -28,7 +28,7 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
                 </ng-container>
 
                 <ng-template #publicChatImage>
-                  <img [src]="info?.image" (error)="errorImage($event)">
+                  <img [src]="info?.image" loading="lazy" (error)="errorImage($event)">
                 </ng-template>
               </ion-avatar>
 
@@ -155,7 +155,11 @@ export class ChatPage implements OnInit, OnDestroy{
   private ngUnsubscribe$ = new Subject<void>();
   pendingStatus$: Observable<boolean> = this.store.pipe(select(fromChatroom.getPendingStatus));
   pending$: Observable<boolean> = this.store.pipe(select(fromChatroom.getPending));
-  statusChatroom$: Observable<string> = this.store.pipe(select(fromChatroom.getStatusChatroom));
+  statusChatroom$: Observable<string> = this.store.pipe(select(fromChatroom.getStatusChatroom),
+    tap(status => {
+      if(status === 'error') this.router.navigate(['/home'])
+    })
+  );
   userLoger$: Observable<any> = this.store.pipe(select(fromAuth.getUser));
 
   info$: Observable<any> = this.route.params.pipe(
@@ -176,7 +180,11 @@ export class ChatPage implements OnInit, OnDestroy{
   });
 
 
-  constructor(private store: Store, private route: ActivatedRoute, public alertController: AlertController, private translate: TranslateService,) {
+  constructor(private store: Store,
+    private route: ActivatedRoute,
+    public alertController: AlertController,
+    private translate: TranslateService,
+    private router: Router) {
     // this.statusChatroom$.subscribe(data => console.log(data))
   }
 
@@ -190,7 +198,7 @@ export class ChatPage implements OnInit, OnDestroy{
       }
     })
 
-    setTimeout(() => this.content?.scrollToBottom(0), 500)
+    setTimeout(() => this.content?.scrollToBottom(0), 1000)
   }
 
   ngOnDestroy(): void{
@@ -239,17 +247,14 @@ export class ChatPage implements OnInit, OnDestroy{
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
       header: this.translate.instant('COMMON.ALERT'),
-      // subHeader: 'Subtitle',
       message: this.translate.instant('COMMON.ALERT_DELETE_MESSAGE'),
       buttons: [
         {
           text: this.translate.instant('COMMON.NO'),
           role: 'cancel',
           cssClass: 'secondary',
-          // handler: (blah) => {
-          //   console.log('Confirm Cancel: blah');
-          // }
-        }, {
+        },
+        {
           text: this.translate.instant('COMMON.YES'),
           handler: () => {
             let chatroomKey = this.route.snapshot?.params?.chatRoomKey

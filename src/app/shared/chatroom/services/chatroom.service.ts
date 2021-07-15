@@ -84,6 +84,7 @@ export class ChatroomService {
     )
   }
 
+  //SAVE MESSAGE FIREBASE
   async saveMessage(message: any, key:string): Promise<any>{
     try{
       const response = await this.firebase.list(`/chatrooms/${key}/messages`).push(message)
@@ -95,6 +96,7 @@ export class ChatroomService {
     }
   }
 
+  //CREATE CHAT FIREBASE
   async createChat(): Promise<any>{
     try{
 
@@ -112,6 +114,7 @@ export class ChatroomService {
     }
   }
 
+  //DELETE FIREBASE
   async deleteMessage(messagekey: string, key: string): Promise<any>{
     try{
       const response = await this.firebase.list(`/chatrooms/${key}/messages/${messagekey}`).remove()

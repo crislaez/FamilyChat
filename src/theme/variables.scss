@@ -261,6 +261,11 @@ $backThirdColor: #214975;
   --color: white;
 }
 
+ion-refresher ion-refresher-content {
+  background: $textColor;
+  --color: #428cff;
+}
+
 ion-content{
   --background: #0D1218 !important;
 }

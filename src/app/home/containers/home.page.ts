@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, ViewChild, EventEmitter } from '@angular/core';
 import { gotToTop, trackById, errorImage, emptyObject } from '@familyChat/shared/shared/utils/utils';
-import { IonContent, IonInfiniteScroll } from '@ionic/angular';
+import { AlertController, IonContent, IonInfiniteScroll } from '@ionic/angular';
 import { ActionSheetController } from '@ionic/angular';
 import { AuthActions } from '@familyChat/shared/auth';
 import { select, Store } from '@ngrx/store';
@@ -10,29 +10,38 @@ import { ModalController } from '@ionic/angular';
 import { SearchPage } from './search.page';
 import { fromAuth } from '@familyChat/shared/auth';
 import { startWith, switchMap, map } from 'rxjs/operators';
+import { User } from './../../shared/user/models/index';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-home',
   template: `
-  <ion-header no-border >
-    <ion-toolbar mode="md|ios">
-      <ion-title class="text-color" >{{'COMMON.TITLE' | translate}}</ion-title>
+  <ng-container *ngIf="(userLoger$ | async) as userLoger">
 
-      <ion-button fill="clear" size="small" slot="end" (click)="presentModal()">
-        <ion-icon class="text-color" name="search-outline"></ion-icon>
-      </ion-button>
+    <ion-header no-border >
+      <ion-toolbar mode="md|ios">
 
-      <ion-button fill="clear" size="small" slot="end" (click)="presentActionSheet()">
-        <ion-icon class="text-color" name="ellipsis-vertical-outline"></ion-icon>
-      </ion-button>
-    </ion-toolbar>
-   </ion-header>
+        <ion-chip class="ion-margin-start">
+          <ion-avatar>
+            <img [src]="userLoger?.avatar" loading="lazy" (error)="errorImage($event)">
+          </ion-avatar>
+          <ion-label class="text-color" >{{userLoger?.name}}</ion-label>
+        </ion-chip>
+        <!-- <ion-title class="text-color" >{{'COMMON.TITLE' | translate}}</ion-title> -->
+
+        <ion-button fill="clear" size="small" slot="end" (click)="presentModal()">
+          <ion-icon class="text-color" name="search-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button fill="clear" size="small" slot="end" (click)="presentActionSheet(userLoger)">
+          <ion-icon class="text-color" name="ellipsis-vertical-outline"></ion-icon>
+        </ion-button>
+      </ion-toolbar>
+    </ion-header>
 
 
-  <ion-content [fullscreen]="true" [scrollEvents]="true" (ionScroll)="logScrolling($any($event))">
-    <div class="container components-color-second">
-
-      <ng-container *ngIf="(userLoger$ | async) as userLoger">
+    <ion-content [fullscreen]="true" [scrollEvents]="true" (ionScroll)="logScrolling($any($event))">
+      <div class="container components-color-second">
 
         <ng-container *ngIf="(info$ | async) as info">
           <ng-container *ngIf="!(pending$ | async); else loader">
@@ -64,12 +73,12 @@ import { startWith, switchMap, map } from 'rxjs/operators';
                   </ion-list>
 
                 <!-- INFINITE SCROLL  -->
-                <!-- <ng-container *ngIf="info?.total > 10"> -->
+                <ng-container *ngIf="info?.total > 15">
                   <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event, info?.total)">
                     <ion-infinite-scroll-content color="primary" class="loadingspinner">
                     </ion-infinite-scroll-content>
                   </ion-infinite-scroll>
-                <!-- </ng-container> -->
+                </ng-container>
 
               </ng-container>
             </ng-container>
@@ -82,40 +91,39 @@ import { startWith, switchMap, map } from 'rxjs/operators';
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
 
-      </ng-container>
-
-      <!-- IS NO DATA  -->
-      <ng-template #noData>
-        <div class="error-serve">
-          <div>
-            <span class="text-color">{{'COMMON.NO_CONTACT' | translate}}</span>
+        <!-- IS NO DATA  -->
+        <ng-template #noData>
+          <div class="error-serve">
+            <div>
+              <span class="text-color">{{'COMMON.NO_CONTACT' | translate}}</span>
+            </div>
           </div>
-        </div>
-      </ng-template>
+        </ng-template>
 
-      <!-- IS ERROR -->
-      <ng-template #serverError>
-        <div class="error-serve">
-          <div>
-            <span><ion-icon class="text-color big-size" name="cloud-offline-outline"></ion-icon></span>
-            <br>
-            <span class="text-color">{{'COMMON.ERROR' | translate}}</span>
+        <!-- IS ERROR -->
+        <ng-template #serverError>
+          <div class="error-serve">
+            <div>
+              <span><ion-icon class="text-color big-size" name="cloud-offline-outline"></ion-icon></span>
+              <br>
+              <span class="text-color">{{'COMMON.ERROR' | translate}}</span>
+            </div>
           </div>
-        </div>
-      </ng-template>
+        </ng-template>
 
-      <!-- LOADER  -->
-      <ng-template #loader>
-        <ion-spinner class="loadingspinner"></ion-spinner>
-      </ng-template>
-    </div>
+        <!-- LOADER  -->
+        <ng-template #loader>
+          <ion-spinner class="loadingspinner"></ion-spinner>
+        </ng-template>
+      </div>
 
-    <!-- TO TOP BUTTON  -->
-    <ion-fab *ngIf="showButton" vertical="bottom" horizontal="end" slot="fixed">
-      <ion-fab-button class="color-button color-button-text" (click)="gotToTop(content)"> <ion-icon name="arrow-up-circle-outline"></ion-icon></ion-fab-button>
-    </ion-fab>
+      <!-- TO TOP BUTTON  -->
+      <ion-fab *ngIf="showButton" vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button class="color-button color-button-text" (click)="gotToTop(content)"> <ion-icon name="arrow-up-circle-outline"></ion-icon></ion-fab-button>
+      </ion-fab>
+    </ion-content>
 
-  </ion-content>
+  </ng-container>
   `,
   styleUrls: ['./home.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -129,7 +137,7 @@ export class HomePage {
   errorImage = errorImage;
   emptyObject = emptyObject;
   showButton: boolean = false;
-  perPage: number = 10;
+  perPage: number = 15;
 
   infiniteScroll$ = new EventEmitter();
   userLoger$: Observable<any> = this.store.pipe(select(fromAuth.getUser));
@@ -137,7 +145,7 @@ export class HomePage {
   statusChatrooms$: Observable<string> = this.store.pipe(select(fromChatroom.getStatusChatrooms));
 
   info$: Observable<{chatrooms:Chatroom[], total:number}> = this.infiniteScroll$.pipe(
-    startWith(10),
+    startWith(15),
     switchMap((perpage) =>
       this.store.pipe(select(fromChatroom.getChatrooms),
         map(chatrooms => {
@@ -151,8 +159,13 @@ export class HomePage {
   );
 
 
-  constructor(public actionSheetController: ActionSheetController, private store: Store, private modalController: ModalController) {
-    // this.info$.subscribe(data => console.log(data))
+  constructor(
+    public actionSheetController: ActionSheetController,
+    private store: Store,
+    private modalController: ModalController,
+    private alertController: AlertController,
+    private translate: TranslateService) {
+    // this.userLoger$.subscribe(data => console.log(data))
   }
 
 
@@ -175,7 +188,7 @@ export class HomePage {
   // INIFINITE SCROLL
   loadData(event, total) {
     setTimeout(() => {
-      this.perPage = this.perPage + 10;
+      this.perPage = this.perPage + 15;
       if(this.perPage >= total){
         if(this.ionInfiniteScroll) this.ionInfiniteScroll.disabled = true
       }
@@ -185,29 +198,48 @@ export class HomePage {
     }, 1000);
   }
 
+
   //CLEAR
   clearAll(): void{
-    this.perPage = 10
+    this.perPage = 15
     this.infiniteScroll$.next(this.perPage)
     if(this.ionInfiniteScroll) this.ionInfiniteScroll.disabled = false
   }
 
-  async presentActionSheet() {
+  getOtherUser(chatroom, loginUser): any{
+    return (Object.keys(chatroom || {}) || []).filter(item => item !== loginUser) || '';
+  }
+
+  // MODALES *********************************************************************
+
+  //MODAL AJUSTES
+  async presentActionSheet(user?:User) {
     const actionSheet = await this.actionSheetController.create({
       cssClass: 'my-custom-class',
-      buttons: [{
-        text: 'LogOut',
-        role: 'destructive',
-        icon: 'log-out',
-        handler: () => {
-          this.store.dispatch(AuthActions.logout())
+      buttons: [
+        {
+          text: this.translate.instant('COMMON.LOGOUT'),
+          role: 'destructive',
+          icon: 'log-out',
+          handler: () => {
+            this.store.dispatch(AuthActions.logout())
+          }
+        },
+        {
+          text: this.translate.instant('COMMON.UNSUBSCRIBE'),
+          role: 'destructive',
+          icon: 'exit-outline',
+          handler: () => {
+            this.presentAlert(user);
+          }
         }
-      }]
+      ]
     });
     await actionSheet.present();
     const { role } = await actionSheet.onDidDismiss();
   }
 
+  // MODAL PARA BUSCAR USUARIOS
   async presentModal() {
     const modal = await this.modalController.create({
       component: SearchPage,
@@ -216,9 +248,32 @@ export class HomePage {
     return await modal.present();
   }
 
-  getOtherUser(chatroom, loginUser): any{
-    return (Object.keys(chatroom || {}) || []).filter(item => item !== loginUser) || '';
+  // MODAL DE CONFIRMACION DARSE DE BAJA
+  async presentAlert(user?:User) {
+    const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
+      header: this.translate.instant('COMMON.ALERT'),
+      message: this.translate.instant('COMMON.UNSUBSCRIBE_CONFIRM_MESSAGE'),
+      buttons: [
+        {
+          text: this.translate.instant('COMMON.NO'),
+          role: 'cancel',
+          cssClass: 'secondary',
+        },
+        {
+          text: this.translate.instant('COMMON.YES'),
+          cssClass: 'secondary',
+          handler: () => {
+            this.store.dispatch(AuthActions.unsubscribe({user}))
+          }
+        }
+      ]
+    });
+    await alert.present();
+    const { role } = await alert.onDidDismiss();
   }
+
+
 
 }
 

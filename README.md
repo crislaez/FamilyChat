@@ -12,6 +12,10 @@ Family chat es una aplicación hecha en Ionic (Angular, TypeScript, Sass/Css, Ht
 <hr>
 <img src="https://github.com/crislaez/FamilyChat/blob/master/src/assets/images/foto_proyecto_5.PNG" />
 <hr>
+<img src="https://github.com/crislaez/FamilyChat/blob/master/src/assets/images/foto_proyecto_6.PNG" />
+<hr>
+<img src="https://github.com/crislaez/FamilyChat/blob/master/src/assets/images/foto_proyecto_7.PNG" />
+<hr>
 
 
 ### Que hace el proyecto

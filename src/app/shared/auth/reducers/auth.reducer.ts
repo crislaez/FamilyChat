@@ -31,7 +31,8 @@ const authReducer = createReducer(
   on(AuthActions.registerSuccess, (state) => ({ ...state, loginStatus:{pending: false} })),
   on(AuthActions.registerFailure, (state, { error }) => ({ ...state, pending: false, loginStatus:{pending: false, error} })),
 
-  on(AuthActions.logout, AuthActions.forceLogout,  state => ({ ...state, user: null })),
+  // AuthActions.unsubscribeSuccess
+  on(AuthActions.logout, AuthActions.forceLogout, state => ({ ...state, user: null })),
 
 );
 

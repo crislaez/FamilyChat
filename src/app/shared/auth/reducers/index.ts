@@ -37,7 +37,6 @@ export const getUserId = createSelector(
 export const isLoggedIn = createSelector(
   getUser,
   (user) => !!user
-  // || Object.keys(user || {})?.length > 0
 );
 
 
