@@ -261,10 +261,6 @@ $backThirdColor: #214975;
   --color: white;
 }
 
-ion-refresher ion-refresher-content {
-  background: $textColor;
-  --color: #428cff;
-}
 
 ion-content{
   --background: #0D1218 !important;
@@ -279,7 +275,6 @@ ion-list {
     width:100%;
   }
 }
-
 
 // PAGE COLOR
 .text-color{
@@ -316,12 +311,11 @@ ion-infinite-scroll-content{
 
 // REFRES ITEM
 ion-refresher {
-  // margin-top: 50px;
+
   ion-spinner{
     position: relative;
     display: flex;
     margin: 0;
-    background: $backColor;
   }
 }
 

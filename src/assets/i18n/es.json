@@ -34,6 +34,9 @@
     "LOGOUT":"Cerrar sesión",
     "UNSUBSCRIBE":"Darse de baja",
     "UNSUBSCRIBE_CONFIRM_MESSAGE":"¿Estas seguro que quieres darte de baja?",
+    "PERFIL_EDIT":"Editar perfil",
+    "SETTINGS":"Ajustes",
+    "CANCEL":"Cancelar",
     "YES":"Si",
     "NO":"No"
   },

@@ -12,6 +12,8 @@ import { fromAuth } from '@familyChat/shared/auth';
 import { startWith, switchMap, map } from 'rxjs/operators';
 import { User } from './../../shared/user/models/index';
 import { TranslateService } from '@ngx-translate/core';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-home',
@@ -162,6 +164,7 @@ export class HomePage {
   constructor(
     public actionSheetController: ActionSheetController,
     private store: Store,
+    private router: Router,
     private modalController: ModalController,
     private alertController: AlertController,
     private translate: TranslateService) {
@@ -218,6 +221,14 @@ export class HomePage {
       cssClass: 'my-custom-class',
       buttons: [
         {
+          text: this.translate.instant('COMMON.PERFIL_EDIT'),
+          role: 'destructive',
+          icon: 'person',
+          handler: () => {
+            this.router.navigate(['/setting'])
+          }
+        },
+        {
           text: this.translate.instant('COMMON.LOGOUT'),
           role: 'destructive',
           icon: 'log-out',
@@ -232,6 +243,10 @@ export class HomePage {
           handler: () => {
             this.presentAlert(user);
           }
+        },
+        {
+          text: this.translate.instant('COMMON.CANCEL'),
+          role: 'cancel'
         }
       ]
     });

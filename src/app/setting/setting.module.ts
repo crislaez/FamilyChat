@@ -4,24 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { SharedModule } from '@familyChat/shared/shared/shared.module';
 import { IonicModule } from '@ionic/angular';
 import { TranslateModule } from '@ngx-translate/core';
-import { HomePage } from './containers/home.page';
-import { SearchPage } from './containers/search.page';
-import { HomePageRoutingModule } from './home-routing.module';
+import { SettingPage } from './containers/setting.page';
+import { SettingPageRoutingModule } from './setting-routing.module';
+
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    HomePageRoutingModule,
+    SettingPageRoutingModule,
     TranslateModule.forChild(),
     SharedModule,
-    // AuthModule,
-    // ChatroomModule
   ],
-  declarations: [
-    HomePage,
-    SearchPage
-  ]
+  declarations: [SettingPage]
 })
-export class HomePageModule {}
+export class SettingPageModule {}
