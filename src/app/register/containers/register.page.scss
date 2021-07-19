@@ -36,6 +36,8 @@ form{
     width: 80%;
     height: 50px;
     margin-top: 30px;
+    --background: #4C9EA0;
+    --color: var(--ion-color-primary-contrast, #fff);
   }
 }
 
@@ -43,3 +45,4 @@ img{
   width: 7em;
   height: 7em;
 }
+

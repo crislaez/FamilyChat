@@ -250,17 +250,17 @@ $textColor: white;
 $textSecondColor: rgb(189, 189, 189);
 $errorColor: red;
 $backColor: #0D1218;
-$backSecondColor: #202C39;
-$backThirdColor: #214975;
+$backSecondColor: #4C9EA0;
+$backThirdColor: #4C9EA0;
+$backfourthColor: #203030;
 
 .loadingspinner{
-  --color: #428cff;
+  --color: #4C9EA0;
 }
 
 .loadingspinnerSecond{
-  --color: white;
+  --color: #4C9EA0;;
 }
-
 
 ion-content{
   --background: #0D1218 !important;
@@ -289,6 +289,9 @@ ion-list {
   color: $textSecondColor;
 }
 
+.text-color-four{
+  color: $backSecondColor;
+}
 
 // PAGE BACKGROUND COLOR
 .components-color{
@@ -381,7 +384,7 @@ ion-menu{
 ion-card{
   // width: 40%;
   width: 80%;
-  background: $backSecondColor;
+  background: $backfourthColor;
   color: $textColor !important;
   // --background: rgba(255,255,255,0.1);
 

@@ -25,6 +25,11 @@ export const unsubscribeFailure = createAction('[Auth] Unsubscribe failure', pro
 export const logout = createAction('[Auth] Logout');
 export const forceLogout = createAction('[Auth] Force logout');
 
+/* AuRegister */
+export const update = createAction('[Auth] Upadte', props<{ name: string, avatar: any }>());
+export const updateSuccess = createAction('[Auth] Upadte success', props<{ message: string }>());
+export const updateFailure = createAction('[Auth] Upadte failure', props<{ error: string }>());
+
 /* Update Loger User */
 export const updateUser = createAction('[Auth] Update user', props<{ user: User }>());
 
@@ -43,6 +48,10 @@ const all = union({
   unsubscribeFailure,
   logout,
   forceLogout,
+  update,
+  updateSuccess,
+  updateFailure,
+  updateUser
 });
 
 export type AuthActionsUnion = typeof all;

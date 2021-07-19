@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ViewChild, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ViewChild, EventEmitter, ChangeDetectorRef, NgZone, OnInit } from '@angular/core';
 import { gotToTop, trackById, errorImage, emptyObject } from '@familyChat/shared/shared/utils/utils';
 import { AlertController, IonContent, IonInfiniteScroll } from '@ionic/angular';
 import { ActionSheetController } from '@ionic/angular';
@@ -13,6 +13,8 @@ import { startWith, switchMap, map } from 'rxjs/operators';
 import { User } from './../../shared/user/models/index';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { AnimationItem } from 'lottie-web';
+import { AnimationOptions } from 'ngx-lottie';
 
 
 @Component({
@@ -21,7 +23,7 @@ import { Router } from '@angular/router';
   <ng-container *ngIf="(userLoger$ | async) as userLoger">
 
     <ion-header no-border >
-      <ion-toolbar mode="md|ios">
+      <ion-toolbar >
 
         <ion-chip class="ion-margin-start">
           <ion-avatar>
@@ -35,9 +37,12 @@ import { Router } from '@angular/router';
           <ion-icon class="text-color" name="search-outline"></ion-icon>
         </ion-button>
 
-        <ion-button fill="clear" size="small" slot="end" (click)="presentActionSheet(userLoger)">
+        <ion-button fill="clear" size="small" slot="end"  (click)="presentActionSheet(userLoger)">
+          <!-- <ng-lottie [options]="options" width="30px" height="30px" (click)="play(1)" (animationCreated)="animationCreated($event)" (complete)="stop()"></ng-lottie> -->
           <ion-icon class="text-color" name="ellipsis-vertical-outline"></ion-icon>
         </ion-button>
+
+
       </ion-toolbar>
     </ion-header>
 
@@ -139,7 +144,20 @@ export class HomePage {
   errorImage = errorImage;
   emptyObject = emptyObject;
   showButton: boolean = false;
+  showAnimateButton: boolean = false
   perPage: number = 15;
+
+  private animationItem: AnimationItem;
+
+  styles: Partial<CSSStyleDeclaration> = {
+    // maxWidth: '25px',
+    // margin: '0 auto',
+    fontSize:'35px',
+  };
+
+  options: AnimationOptions = {
+    path: '../../../assets/animations/27375-menu-burger-1.json',
+  };
 
   infiniteScroll$ = new EventEmitter();
   userLoger$: Observable<any> = this.store.pipe(select(fromAuth.getUser));
@@ -167,7 +185,9 @@ export class HomePage {
     private router: Router,
     private modalController: ModalController,
     private alertController: AlertController,
-    private translate: TranslateService) {
+    private translate: TranslateService,
+    private cref: ChangeDetectorRef,
+    private ngZone: NgZone) {
     // this.userLoger$.subscribe(data => console.log(data))
   }
 
@@ -242,16 +262,21 @@ export class HomePage {
           icon: 'exit-outline',
           handler: () => {
             this.presentAlert(user);
+            this.play(-1)
           }
         },
         {
           text: this.translate.instant('COMMON.CANCEL'),
-          role: 'cancel'
+          role: 'cancel',
+          handler: () => {
+            this.play(-1)
+          }
         }
       ]
     });
     await actionSheet.present();
     const { role } = await actionSheet.onDidDismiss();
+
   }
 
   // MODAL PARA BUSCAR USUARIOS
@@ -288,7 +313,35 @@ export class HomePage {
     const { role } = await alert.onDidDismiss();
   }
 
+  animationCreated(animationItem: AnimationItem): void {
+    this.animationItem?.stop();
+    this.animationItem = animationItem;
+    // this.animationItem.playDirection = -1
 
+  }
+
+  stop(): void {
+    console.log('aqui')
+    this.ngZone.runOutsideAngular(() => {
+
+      this.animationItem.playDirection = -1
+      this.animationItem?.pause();
+    });
+  }
+
+  play(direction: number): void {
+    this.ngZone.runOutsideAngular(() => {
+      if(direction === 1){
+
+      }else{
+
+      }
+      console.log(this.animationItem?.segments)
+      // this.animationItem.playDirection = direction
+      // console.log( this.animationItem.playDirection)
+      this.animationItem?.play();
+    });
+  }
 
 }
 

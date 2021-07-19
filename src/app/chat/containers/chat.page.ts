@@ -18,7 +18,7 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
       <ng-container *ngIf="(userLoger$ | async) as userLoger">
 
         <ion-header no-border >
-          <ion-toolbar mode="md|ios">
+          <ion-toolbar>
             <ion-back-button defaultHref="/home" class="text-color" fill="clear" size="small" slot="start" [text]="''"></ion-back-button>
 
             <ion-chip class="ion-margin-start">
@@ -103,7 +103,7 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
                 <ion-textarea class="text-color" [placeholder]="'COMMON.MESSAGE' | translate" formControlName="message" ></ion-textarea>
               </ion-item>
 
-              <ion-button fill="clear"  type="submit"><ion-icon class="text-color" name="send-outline"></ion-icon></ion-button>
+              <ion-button fill="clear" type="submit"><ion-icon class="text-color-four" name="send-outline"></ion-icon></ion-button>
             </form>
           </ion-toolbar>
         </ion-footer>

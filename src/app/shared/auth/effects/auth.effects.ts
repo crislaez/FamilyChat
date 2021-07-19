@@ -4,10 +4,11 @@ import { ToastController } from '@ionic/angular';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { catchError, exhaustMap, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, exhaustMap, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import * as AuthActions from '../actions/auth.actions';
 import { AuthService } from '../services/auth.service';
-
+import { select, Store } from '@ngrx/store';
+import * as fromAuth from '../reducers'
 
 @Injectable()
 export class AuthEffects {
@@ -62,10 +63,25 @@ export class AuthEffects {
   unsubscribe$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.unsubscribe),
-      exhaustMap(({user}) =>
+      switchMap(({user}) =>
         this._auth.unsubscribe(user).pipe(
           map(() => AuthActions.forceLogout()),
           catchError(error => [AuthActions.unsubscribeFailure({ error: 'COMMON.UNSUBSCRIBE_FAILURE_MESSAGE' })])
+        )
+      )
+    )
+  );
+
+  update$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.update),
+      withLatestFrom(
+        this.store.pipe(select(fromAuth.getUser))
+      ),
+      switchMap(([ {name, avatar}, {$key} ]) =>
+        this._auth.update($key, name, avatar).pipe(
+          map(() => AuthActions.updateSuccess({message:'COMMON.UPDATE_USER_SUCCESS'})),
+          catchError(error => [AuthActions.updateFailure({ error: 'COMMON.UPDATE_USER_FAILURE' })])
         )
       )
     )
@@ -107,9 +123,16 @@ export class AuthEffects {
     ), { dispatch: false }
   );
 
+  messageSuccessAuth$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.updateSuccess),
+      tap(({message}) => this.presentToast(this.translate.instant(message), 'success')),
+    ), { dispatch: false }
+);
+
   messageFailureAuth$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthActions.loginFailure, AuthActions.registerFailure, AuthActions.unsubscribeFailure),
+      ofType(AuthActions.loginFailure, AuthActions.registerFailure, AuthActions.unsubscribeFailure, AuthActions.updateFailure),
       tap(({error}) => this.presentToast(this.translate.instant(error), 'danger')),
     ), { dispatch: false }
   );
@@ -125,7 +148,8 @@ export class AuthEffects {
     private router: Router,
     private _auth: AuthService,
     private translate: TranslateService,
-    public toastController: ToastController
+    public toastController: ToastController,
+    private store: Store
   ) { }
 
 

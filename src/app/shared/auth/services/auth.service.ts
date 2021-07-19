@@ -2,10 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFireDatabase } from '@angular/fire/database';
+import { AngularFireStorage } from '@angular/fire/storage';
 import { Storage } from '@capacitor/storage';
 import * as CryptoJS from 'crypto-js';
-import { from, Observable, throwError } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { from, Observable, throwError, of } from 'rxjs';
+import { catchError, map, switchMap, finalize } from 'rxjs/operators';
 import { User } from '../models';
 
 
@@ -20,7 +21,7 @@ export class AuthService {
   private readonly SECRET_KEY = {key:'SECRET_KEY:FAMILY_CHAT'}
 
 
-  constructor(private http: HttpClient, private auth: AngularFireAuth, private firebase: AngularFireDatabase) { }
+  constructor(private http: HttpClient, private auth: AngularFireAuth, private firebase: AngularFireDatabase, private storage: AngularFireStorage) { }
 
 
   login(email: string, password: string): Observable<any> {
@@ -87,6 +88,17 @@ export class AuthService {
           throw throwError({error: response?.error})
         }
         return response
+      })
+    )
+  }
+
+  update(key: string, name: string, avatar: any): Observable<any> {
+    return from(this.updateUserFirebase(key, name, avatar)).pipe(
+      map(response => {
+        if(response?.error){
+          throw throwError({error: response?.error})
+        }
+        return response?.userCredential
       })
     )
   }
@@ -175,6 +187,26 @@ export class AuthService {
     }
   }
 
+  //UPDATE FIREBASE
+  async updateUserFirebase(key: string, name: string, avatar: any): Promise<any>{
+    try{
+      let result;
+      if(!!avatar){
+        const path = `images/${avatar.name}`;
+        const ref = this.storage.ref(path)
+        await this.storage.upload(path, avatar)
+        let downloadURL = await ref.getDownloadURL().toPromise();
+        result = await this.firebase.object(`/users/${key}/avatar`).set(downloadURL);
+      }
+
+      if(!!name) result = await this.firebase.object(`/users/${key}/name`).set(name);
+
+      return result
+    }catch(error){
+      return {error: error.message}
+    }
+  }
+
   //***************************** STORAGE *****************************
   // SAVE TOKEN
   async saveLocalToken(token: string): Promise<any>{
@@ -193,19 +225,6 @@ export class AuthService {
     await Storage.remove({key: this.TOKEN_LABEL})
   }
 
-
-
-  // getHeaders(): HttpHeaders {
-  //   const language = this.translate.currentLang;
-  //   return new HttpHeaders({
-  //     'Accept-Language': language,
-  //     Authorization: `Bearer ${this._token}`,
-  //     // 'Content-Type':'application/force-download',
-  //     'Content-Type': 'application/json',
-  //     // 'Content-Type': 'multipart/form-data'
-  //     // 'enctype': 'multipart/form-data'
-  //   });
-  // };
 
 
 }

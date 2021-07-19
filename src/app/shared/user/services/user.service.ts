@@ -1,12 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFireDatabase } from '@angular/fire/database';
-import { Storage } from '@capacitor/storage';
-import { from, Observable, of, throwError } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs/operators';
-import { User } from '../models';
-
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
