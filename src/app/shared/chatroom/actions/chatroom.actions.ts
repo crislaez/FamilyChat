@@ -16,6 +16,14 @@ export const saveMessage = createAction('[Chatroom] Save Message', props<{messag
 export const saveMessageFailure = createAction('[Chatroom] Save Message Failure', props<{error: string }>());
 export const saveMessageSuccess = createAction('[Chatroom] Save Message Success', props<{key: string}>());
 
+export const saveAudioMessage = createAction('[Chatroom] Save Audio Message', props<{message: any, key: string}>());
+export const saveAudioMessageFailure = createAction('[Chatroom] Save Audio Message Failure', props<{error: string }>());
+export const saveAudioMessageSuccess = createAction('[Chatroom] Save Audio Message Success', props<{key: string}>());
+
+export const savePhotoMessage = createAction('[Chatroom] Save Photo Message', props<{message: any, key: string}>());
+export const savePhotoMessageFailure = createAction('[Chatroom] Save Photo Message Failure', props<{error: string }>());
+export const savePhotoMessageSuccess = createAction('[Chatroom] Save Photo Message Success', props<{key: string}>());
+
 export const deleteMessage = createAction('[Chatroom] Delete Message', props<{messageKey: string, key: string}>());
 export const deleteMessageFailure = createAction('[Chatroom] Delete Message Failure', props<{error: string }>());
 export const deleteMessageSuccess = createAction('[Chatroom] Delete Message Success', props<{key: string, message?:string}>());
@@ -32,6 +40,12 @@ const all = union({
   saveMessage,
   saveMessageFailure,
   saveMessageSuccess,
+  saveAudioMessage,
+  saveAudioMessageFailure,
+  saveAudioMessageSuccess,
+  savePhotoMessage,
+  savePhotoMessageFailure,
+  savePhotoMessageSuccess,
   deleteMessage,
   deleteMessageFailure,
   deleteMessageSuccess

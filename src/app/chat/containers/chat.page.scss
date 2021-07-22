@@ -6,13 +6,34 @@ ion-toolbar{
   height:100%
 }
 
+.footer-toolbar{
+  height:100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-content: center;
+
+  div{
+    width: 14%;
+
+    ion-button{
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+  }
+}
+
 form {
   // background:red;
   --background:#0D1218;
+  margin: 0;
   margin-top: 0px;
-  width: 100%;
+  width: 70%;
   height: 50px;
-  // @include displays-around;
+  text-align: start;
+
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -25,8 +46,11 @@ form {
   }
 
   ion-button{
-    width: 15%
+    width: 20%;
+    height: 100%;
+    margin: 0;
   }
+
 }
 
 ion-toolbar{
@@ -43,6 +67,9 @@ ion-toolbar{
   border-top-right-radius: 25px;
   border-bottom-right-radius: 25px;
   border-bottom-left-radius: 0px;
+  ion-avatar{
+    border: 2px solid $backThirdColor;
+  }
 }
 
 .card-arrow-rigth{
@@ -50,6 +77,9 @@ ion-toolbar{
   border-top-right-radius: 25px;
   border-bottom-left-radius: 25px;
   border-bottom-right-radius: 0px;
+  ion-avatar{
+    border: 2px solid $backfourthColor;
+  }
 }
 
 
@@ -58,4 +88,10 @@ ion-toolbar{
   height:20px;
   justify-self: flex-end !important;
   margin-left: auto;
+}
+
+.chat-photo{
+  width: 90%;
+  min-height: 100px;
+  border-radius: 0% !important;
 }

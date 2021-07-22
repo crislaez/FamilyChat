@@ -24,7 +24,6 @@ import { AnimationOptions } from 'ngx-lottie';
 
     <ion-header no-border >
       <ion-toolbar >
-
         <ion-chip class="ion-margin-start">
           <ion-avatar>
             <img [src]="userLoger?.avatar" loading="lazy" (error)="errorImage($event)">
@@ -34,14 +33,14 @@ import { AnimationOptions } from 'ngx-lottie';
         <!-- <ion-title class="text-color" >{{'COMMON.TITLE' | translate}}</ion-title> -->
 
         <ion-button fill="clear" size="small" slot="end" (click)="presentModal()">
+          <!-- <ng-lottie [options]="optionsSearch" width="50px" height="50px" (click)="playSeaarch()" (animationCreated)="animationCreatedSearch($event)"></ng-lottie> -->
           <ion-icon class="text-color" name="search-outline"></ion-icon>
         </ion-button>
 
         <ion-button fill="clear" size="small" slot="end"  (click)="presentActionSheet(userLoger)">
-          <!-- <ng-lottie [options]="options" width="30px" height="30px" (click)="play(1)" (animationCreated)="animationCreated($event)" (complete)="stop()"></ng-lottie> -->
-          <ion-icon class="text-color" name="ellipsis-vertical-outline"></ion-icon>
+          <ng-lottie [options]="options" width="30px" height="30px" (click)="play()" (animationCreated)="animationCreated($event)"></ng-lottie>
+          <!-- <ion-icon class="text-color" name="ellipsis-vertical-outline"></ion-icon> -->
         </ion-button>
-
 
       </ion-toolbar>
     </ion-header>
@@ -148,6 +147,7 @@ export class HomePage {
   perPage: number = 15;
 
   private animationItem: AnimationItem;
+  private animationItemSearch: AnimationItem;
 
   styles: Partial<CSSStyleDeclaration> = {
     // maxWidth: '25px',
@@ -158,6 +158,10 @@ export class HomePage {
   options: AnimationOptions = {
     path: '../../../assets/animations/27375-menu-burger-1.json',
   };
+
+  // optionsSearch: AnimationOptions = {
+  //   path: '../../../assets/animations/64049-search-icon.json',
+  // };
 
   infiniteScroll$ = new EventEmitter();
   userLoger$: Observable<any> = this.store.pipe(select(fromAuth.getUser));
@@ -221,7 +225,6 @@ export class HomePage {
     }, 1000);
   }
 
-
   //CLEAR
   clearAll(): void{
     this.perPage = 15
@@ -246,6 +249,7 @@ export class HomePage {
           icon: 'person',
           handler: () => {
             this.router.navigate(['/setting'])
+            this.play(-1)
           }
         },
         {
@@ -254,6 +258,7 @@ export class HomePage {
           icon: 'log-out',
           handler: () => {
             this.store.dispatch(AuthActions.logout())
+            this.play(-1)
           }
         },
         {
@@ -314,34 +319,27 @@ export class HomePage {
   }
 
   animationCreated(animationItem: AnimationItem): void {
-    this.animationItem?.stop();
     this.animationItem = animationItem;
-    // this.animationItem.playDirection = -1
-
+    this.animationItem.autoplay = false;
+    this.animationItem.loop = false;
   }
 
-  stop(): void {
-    console.log('aqui')
-    this.ngZone.runOutsideAngular(() => {
+  // animationCreatedSearch(animationItem: AnimationItem): void {
+  //   this.animationItemSearch = animationItem;
+  //   this.animationItemSearch.autoplay = false;
+  //   this.animationItemSearch.loop = false;
+  // }
 
-      this.animationItem.playDirection = -1
-      this.animationItem?.pause();
-    });
+
+  play(direction:number = 1): void {
+    this.animationItem.setDirection(Math.sign(direction) === 1 ? 1 : -1)
+    this.animationItem?.play();
   }
 
-  play(direction: number): void {
-    this.ngZone.runOutsideAngular(() => {
-      if(direction === 1){
-
-      }else{
-
-      }
-      console.log(this.animationItem?.segments)
-      // this.animationItem.playDirection = direction
-      // console.log( this.animationItem.playDirection)
-      this.animationItem?.play();
-    });
-  }
+  // playSeaarch(direction:number = 1): void {
+  //   this.animationItemSearch.setDirection(Math.sign(direction) === 1 ? 1 : -1)
+  //   this.animationItemSearch?.play();
+  // }
 
 }
 

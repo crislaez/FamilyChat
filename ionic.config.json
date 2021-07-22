@@ -1,5 +1,7 @@
 {
   "name": "family_chat",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

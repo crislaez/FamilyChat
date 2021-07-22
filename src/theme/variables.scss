@@ -250,16 +250,16 @@ $textColor: white;
 $textSecondColor: rgb(189, 189, 189);
 $errorColor: red;
 $backColor: #0D1218;
-$backSecondColor: #4C9EA0;
-$backThirdColor: #4C9EA0;
-$backfourthColor: #203030;
+$backSecondColor: #5C88CF;
+$backThirdColor: #5C88CF;
+$backfourthColor: #2A3C58;
 
 .loadingspinner{
-  --color: #4C9EA0;
+  --color: #5C88CF;
 }
 
 .loadingspinnerSecond{
-  --color: #4C9EA0;;
+  --color: #5C88CF
 }
 
 ion-content{
@@ -291,6 +291,10 @@ ion-list {
 
 .text-color-four{
   color: $backSecondColor;
+}
+
+.text-color-five{
+  color: $backfourthColor;
 }
 
 // PAGE BACKGROUND COLOR
@@ -406,11 +410,14 @@ ion-card{
     font-weight: bold;
   }
 
-  img{
-    font-size: 15px;
-    width: 100%;
-    border-radius: 50%;
+  ion-avatar {
+    img{
+      font-size: 15px;
+      width: 100%;
+      border-radius: 50%;
+    }
   }
+
 
   ion-icon {
     font-size: 25px;
@@ -420,6 +427,11 @@ ion-card{
 ion-button{
   --border-radius: 50px !important;
   --box-shadow: none !important;
+
+  ion-icon{
+    font-weight: bold;
+    font-size: 23px;
+  }
 }
 
 ion-item{
@@ -445,7 +457,7 @@ ion-list{
 }
 
 ion-avatar{
-  border: 2px solid $backThirdColor;
+  // border: 2px solid $backThirdColor;
   box-shadow: 0;
   width:3.2em;
   height:3em;
@@ -603,6 +615,10 @@ ion-avatar{
   align-items: center;
 }
 
+.border-around{
+  border-radius: 50%;
+}
+
 // ********** END APP CONFIG
 .div-header-fixed{
   width: 100%;
@@ -694,6 +710,10 @@ ion-avatar{
 .fade-in-card {
   // animation: fadeIn 2s;
   animation: fadeInUp 0.2s;
+}
+
+.hide{
+  display: none;
 }
 
 @keyframes fadeIn {

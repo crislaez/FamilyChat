@@ -18,5 +18,10 @@ export const gotToTop = (content: IonContent): void => {
   content.scrollToTop(500);
 }
 
+export const now_date = () => {
+  const newDate = new Date();
+  return newDate.getTime();
+}
+
 
 

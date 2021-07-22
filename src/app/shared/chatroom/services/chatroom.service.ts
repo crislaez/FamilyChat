@@ -3,6 +3,7 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { from, Observable, throwError, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { User } from '../../user/models';
+import { AngularFireStorage } from '@angular/fire/storage';
 
 
 @Injectable({
@@ -10,7 +11,7 @@ import { User } from '../../user/models';
 })
 export class ChatroomService {
 
-  constructor(private firebase: AngularFireDatabase) { }
+  constructor(private firebase: AngularFireDatabase, private storage: AngularFireStorage) { }
 
 
   getChatrooms(chats:any): Observable<any>{
@@ -51,8 +52,33 @@ export class ChatroomService {
     )
   }
 
+  // MENSAJE DE TEXTO
   saveMessageByChatroom(message: any, key:string): Observable<any>{
     return from(this.saveMessage(message, key)).pipe(
+      map(response => {
+        if(response?.error){
+          throw throwError({error: response?.error}) //forzar el error
+        }
+        return response
+      })
+    )
+  }
+
+  // MENSAJE DE AUDIO
+  saveAudioMessageByChatroom(message: any, key:string): Observable<any>{
+    return from(this.saveMessage(message, key)).pipe(
+      map(response => {
+        if(response?.error){
+          throw throwError({error: response?.error}) //forzar el error
+        }
+        return response
+      })
+    )
+  }
+
+  // MENSAJE FOTO
+  savePhotoMessageByChatroom(message: any, key:string): Observable<any>{
+    return from(this.savePhotoMessage(message, key)).pipe(
       map(response => {
         if(response?.error){
           throw throwError({error: response?.error}) //forzar el error
@@ -84,12 +110,39 @@ export class ChatroomService {
     )
   }
 
-  //SAVE MESSAGE FIREBASE
+  //GUARDAR MENSAJE FIREBASE
   async saveMessage(message: any, key:string): Promise<any>{
     try{
       const response = await this.firebase.list(`/chatrooms/${key}/messages`).push(message)
-      // const response = await this.firebase.database.ref(`/chatrooms/${key}`).child('messages').set(message)
       return {response}
+    }
+    catch(error){
+      return {error: error.message}
+    }
+  }
+
+  //GUARDAR MENSAJE AUDIO FIREBASE
+  async saveAudioMessage(message: any, key:string): Promise<any>{
+    try{
+      const response = await this.firebase.list(`/chatrooms/${key}/messages`).push(message)
+      return {response}
+    }
+    catch(error){
+      return {error: error.message}
+    }
+  }
+
+  //GUARDAR MENSAJE FOTO FIREBASE
+  async savePhotoMessage(message: any, key:string): Promise<any>{
+
+    try{
+        const photo = message?.message
+        const path = `photos/${photo.name}`;
+        const ref = this.storage.ref(path)
+        await this.storage.upload(path, photo)
+        let downloadURL = await ref.getDownloadURL().toPromise();
+        const response = await this.firebase.list(`/chatrooms/${key}/messages`).push({...message, message:downloadURL})
+        return {response}
     }
     catch(error){
       return {error: error.message}
@@ -152,3 +205,8 @@ export class ChatroomService {
   }
 
 }
+// const path = `images/${avatar.name}`;
+// const ref = this.storage.ref(path)
+// await this.storage.upload(path, avatar)
+// let downloadURL = await ref.getDownloadURL().toPromise();
+// result = await this.firebase.object(`/users/${key}/avatar`).set(downloadURL);

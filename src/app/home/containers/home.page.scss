@@ -1,2 +1,13 @@
 @import '../../../theme/variables';
 
+ion-chip {
+  ion-avatar{
+    border: 2px solid $backfourthColor;
+  }
+}
+
+ion-content {
+  ion-avatar{
+    border: 2px solid $backThirdColor;
+  }
+}

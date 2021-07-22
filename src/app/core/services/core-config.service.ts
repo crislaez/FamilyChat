@@ -32,5 +32,9 @@ export class CoreConfigService {
     return `${this._env.baseEndpoint}`;
   }
 
+  getPublicChatName(): string {
+    return `${this._env.publicChatName}`
+  }
+
 
 }

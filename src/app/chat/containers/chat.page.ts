@@ -1,14 +1,17 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { fromAuth, User } from '@familyChat/shared/auth';
 import { ChatroomActions, fromChatroom } from '@familyChat/shared/chatroom';
 import { emptyObject, errorImage, trackById } from '@familyChat/shared/shared/utils/utils';
-import { AlertController } from '@ionic/angular';
+import { AlertController, IonButton } from '@ionic/angular';
 import { select, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subject } from 'rxjs';
-import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { filter, switchMap, takeUntil, tap, startWith } from 'rxjs/operators';
+import { now_date } from '@familyChat/shared/shared/utils/utils'
+// import { Camera, CameraResultType } from '@capacitor/camera';
+// import { MediaCapture, MediaFile, CaptureError, CaptureImageOptions } from '@ionic-native/media-capture/ngx';
 
 @Component({
   selector: 'app-chat',
@@ -61,7 +64,13 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
                         <ion-button *ngIf="userLoger?.ui === info?.messages[message]?.ui" fill="clear" class="text-color delete-button displays-center" (click)="deleteMessage(message)"><ion-icon class="font-big" name="close-outline"></ion-icon></ion-button>
                       </div>
 
-                      <div class="margin-top">{{info?.messages[message]?.message}}</div>
+                      <ng-container *ngIf="checkIsPhoto(info?.messages[message]?.message); else divPhoto">
+                        <div class="margin-top">{{info?.messages[message]?.message}}</div>
+                      </ng-container>
+                      <ng-template #divPhoto>
+                        <img class="chat-phot" [src]="info?.messages[message]?.message" loading="lazy" />
+                      </ng-template>
+
                       <div class="margin-top font-small text-color-third">{{getTimeStamp(info?.messages[message]?.create_at) | date: 'MMMM d, h:mm a'}}</div>
                     </ion-card-content>
                   </ion-card>
@@ -98,13 +107,24 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
         <ion-footer >
           <ion-toolbar class="components-color-second">
-            <form [formGroup]="messageForm" (submit)="messageSubmit($event, userLoger)">
-              <ion-item >
-                <ion-textarea class="text-color" [placeholder]="'COMMON.MESSAGE' | translate" formControlName="message" ></ion-textarea>
-              </ion-item>
+            <div class="footer-toolbar">
+              <form [formGroup]="messageForm" (submit)="messageSubmit($event, userLoger)">
+                <ion-item >
+                  <ion-textarea class="text-color" [placeholder]="'COMMON.MESSAGE' | translate" formControlName="message" ></ion-textarea>
+                </ion-item>
 
-              <ion-button fill="clear" type="submit"><ion-icon class="text-color-four" name="send-outline"></ion-icon></ion-button>
-            </form>
+                <ion-button fill="clear" type="submit"><ion-icon class="text-color-four" name="send-outline"></ion-icon></ion-button>
+              </form>
+
+              <div>
+                <ion-button (click)="takePicture()" class="border-around"> <ion-icon class="text-color" name="camera-outline"></ion-icon></ion-button>
+                <ion-input id="inputPhoto" #inputPhoto class="hide" type="file" (change)="getPhoto($event, userLoger)" ></ion-input>
+              </div>
+
+              <div>
+                <ion-button class="border-around"> <ion-icon class="text-color" name="mic-outline"></ion-icon></ion-button>
+              </div>
+            </div>
           </ion-toolbar>
         </ion-footer>
 
@@ -148,9 +168,14 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 export class ChatPage implements OnInit, OnDestroy{
 
   @ViewChild('content') private content: any;
+  // @ViewChild('inputPhoto', {static: true }) private inputPhoto: ElementRef;
+  @ViewChild("inputPhoto") inputPhoto: ElementRef;
+
   trackById = trackById;
   errorImage = errorImage;
   emptyObject = emptyObject;
+
+  image = new FormControl('', [Validators.required])
 
   private ngUnsubscribe$ = new Subject<void>();
   pendingStatus$: Observable<boolean> = this.store.pipe(select(fromChatroom.getPendingStatus));
@@ -225,8 +250,6 @@ export class ChatPage implements OnInit, OnDestroy{
       this.store.dispatch(ChatroomActions.saveMessage({message:this.messageForm.value, key}))
       this.messageForm.reset();
     }
-
-
   }
 
   // CHAT OBJECTS KEY
@@ -271,5 +294,57 @@ export class ChatPage implements OnInit, OnDestroy{
   getOtherUser(chatroom, loginUser): any{
     return (Object.keys(chatroom || {}) || []).filter(item => item !== loginUser) || '';
   }
+
+  getPhoto(event, userLoger: User): void{
+    const photo = event.target.files[0]
+    let key = this.route.snapshot?.params?.chatRoomKey
+    if(!!photo){
+
+    const newDate = new Date();
+    const create_at = newDate.getTime();
+      const message = {
+        ui:userLoger?.ui,
+        name:userLoger?.name,
+        create_at:create_at,
+        avatar:userLoger?.avatar,
+        message:photo
+      }
+      this.store.dispatch(ChatroomActions.savePhotoMessage({message, key}))
+    }
+  }
+
+  takePicture(): void{
+    let element: HTMLElement = document.querySelector('input[type="file"]') as HTMLElement;
+    element.click();
+  }
+
+  checkIsPhoto(message): boolean{
+    if(message) return !!message.startsWith('https://') ? false : true
+    return true
+  }
+
+  getSound(): void{
+
+  }
+
+//  async takePicture (event) {
+//     const image = await Camera.getPhoto({
+//       quality: 90,
+//       allowEditing: true,
+//       resultType: CameraResultType.Uri
+//     });
+
+//     console.log(image)
+//     // let key = this.route.snapshot?.params?.chatRoomKey
+//     // if(!!image.webPath)  this.store.dispatch(ChatroomActions.savePhotoMessage({photo:image, key}))
+
+
+//     var imageUrl = image.webPath;
+
+//     // Can be set to the src of an image now
+//     // imageElement.src = imageUrl;
+//   };
+
+
 
 }

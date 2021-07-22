@@ -33,9 +33,9 @@ const chatroomReducer = createReducer(
   on(ChatroomActions.loadChatroom, (state) => ({...state, pending: true})),
   on(ChatroomActions.saveChatroom, (state, { chatroom, statusChatroom }) => ({...state, chatroom, pending: false, statusChatroom })),
 
-  on(ChatroomActions.saveMessage, (state) => ({...state, pendingStatus:{ pending: true}})),
-  on(ChatroomActions.saveMessageFailure, (state, { error }) => ({...state,  pendingStatus:{ pending: false, error} })),
-  on(ChatroomActions.saveMessageSuccess, (state) => ({...state, pendingStatus:{ pending: false} })),
+  on(ChatroomActions.saveMessage, ChatroomActions.saveAudioMessageFailure, ChatroomActions.savePhotoMessage, (state) => ({...state, pendingStatus:{ pending: true}})),
+  on(ChatroomActions.saveMessageFailure, ChatroomActions.saveAudioMessageFailure, ChatroomActions.savePhotoMessageFailure, (state, { error }) => ({...state,  pendingStatus:{ pending: false, error} })),
+  on(ChatroomActions.saveMessageSuccess, ChatroomActions.saveAudioMessageSuccess, ChatroomActions.savePhotoMessageSuccess, (state) => ({...state, pendingStatus:{ pending: false} })),
 
   on(ChatroomActions.deleteMessage, (state) => ({...state, pendingStatus:{ pending: true}})),
   on(ChatroomActions.deleteMessageFailure, (state, { error }) => ({...state, pendingStatus:{ pending: false, error} })),

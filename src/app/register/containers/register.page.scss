@@ -19,7 +19,6 @@
 form{
   width: 80%;
   height: 70%;
-  // background: blue;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -36,7 +35,7 @@ form{
     width: 80%;
     height: 50px;
     margin-top: 30px;
-    --background: #4C9EA0;
+    --background: #5C88CF;
     --color: var(--ion-color-primary-contrast, #fff);
   }
 }

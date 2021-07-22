@@ -8,6 +8,7 @@ import * as CryptoJS from 'crypto-js';
 import { from, Observable, throwError, of } from 'rxjs';
 import { catchError, map, switchMap, finalize } from 'rxjs/operators';
 import { User } from '../models';
+import { CoreConfigService } from './../../../core/services/core-config.service';
 
 
 @Injectable({
@@ -19,9 +20,16 @@ export class AuthService {
   public _token: string;
   private readonly TOKEN_LABEL = 'API_FAMILYCHAT_TOKEN';
   private readonly SECRET_KEY = {key:'SECRET_KEY:FAMILY_CHAT'}
+  private publicChatName: string = this.coreConfig.getPublicChatName();   // '-Me4gjWhJZhxkwowxrvc'
 
 
-  constructor(private http: HttpClient, private auth: AngularFireAuth, private firebase: AngularFireDatabase, private storage: AngularFireStorage) { }
+  constructor(
+    private http: HttpClient,
+    private auth: AngularFireAuth,
+    private firebase: AngularFireDatabase,
+    private storage: AngularFireStorage,
+    private coreConfig: CoreConfigService
+  ) { }
 
 
   login(email: string, password: string): Observable<any> {
@@ -145,7 +153,7 @@ export class AuthService {
       let encryptPassword = CryptoJS.SHA256(password, this.SECRET_KEY).toString();
 
       const response = await this.firebase.list('/users').push({name, email, password:encryptPassword, ui, create_at, avatar:'', chats:''}) //crear usuario en RealTime database
-      const result = await await this.firebase.list(`/users/${response?.key}/chats`).push('-Me4gjWhJZhxkwowxrvc'); //agregar chat publico en campo chat recien creado
+      const result = await await this.firebase.list(`/users/${response?.key}/chats`).push(this.publicChatName); //agregar chat publico en campo chat recien creado
 
       return {response}
     }
@@ -172,7 +180,7 @@ export class AuthService {
       await (await this.auth.currentUser).delete(); //borrar usuario de Authentication
 
       for await (let chatroomKey of Object.values(userLogin?.chats)){
-        if(chatroomKey !== '-Me4gjWhJZhxkwowxrvc'){
+        if(chatroomKey !== this.publicChatName){
           await this.firebase.list(`/chatrooms/${chatroomKey}`).remove() //borramos los chatrooms que tengan esos keys
           // let result = await this.firebase.list('/users', ref => ref.orderByChild('chats').equalTo('') ).snapshotChanges().subscribe(data => console.log(data))
           // .remove()

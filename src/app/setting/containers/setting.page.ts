@@ -98,7 +98,7 @@ export class SettingPage implements OnInit {
 
 
   constructor(private store: Store) {
-    this.pending$.subscribe(data => console.log(data))
+    // this.pending$.subscribe(data => console.log(data))
   }
 
 

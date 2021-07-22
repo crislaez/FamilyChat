@@ -15,9 +15,9 @@ import { fromAuth } from '@familyChat/shared/auth';
 @Component({
   selector: 'app-search.page',
   template:`
-  <ion-header translucent>
+  <ion-header >
     <ion-toolbar>
-      <ion-title class="text-color">Modal Content</ion-title>
+      <ion-title class="text-color">{{'COMMON.USERS' | translate}}</ion-title>
       <ion-buttons class="text-color" slot="end">
         <ion-button  (click)="dismiss()"><ion-icon fill="clear" class="text-color" name="close-outline"></ion-icon></ion-button>
       </ion-buttons>

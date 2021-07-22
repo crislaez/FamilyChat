@@ -78,6 +78,20 @@ export class ChatroomEffects {
     )
   );
 
+  savePhotoMessage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ChatroomActions.savePhotoMessage),
+      switchMap(({message, key}) =>
+        this._chatroom.savePhotoMessageByChatroom(message, key).pipe(
+          map(() => ChatroomActions.savePhotoMessageSuccess({key}) ),
+          catchError((error) => {
+            return [ChatroomActions.savePhotoMessageFailure({error: 'COMMON.MESSAGE_SEND_ERROR'}) ]
+          })
+        )
+      )
+    )
+  );
+
   deleteMessage$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ChatroomActions.deleteMessage),
@@ -123,7 +137,12 @@ export class ChatroomEffects {
 
   messageFailure$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ChatroomActions.saveMessageFailure, ChatroomActions.deleteMessageFailure, ChatroomActions.createChatroomFailure),
+      ofType(
+        ChatroomActions.saveMessageFailure,
+        ChatroomActions.deleteMessageFailure,
+        ChatroomActions.createChatroomFailure,
+        ChatroomActions.savePhotoMessageFailure
+        ),
       tap(({error}) => this.presentToast(this.translate.instant(error), 'danger')),
     ), { dispatch: false }
   );
