@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">family_chat</string>
-    <string name="title_activity_main">family_chat</string>
-    <string name="package_name">com.example.familychat</string>
-    <string name="custom_url_scheme">com.example.familychat</string>
-</resources>
